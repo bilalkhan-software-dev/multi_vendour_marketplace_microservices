@@ -7,6 +7,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface SellerAddressRepository extends JpaRepository<SellerAddress,Long>{
 
 
-    SellerAddress findBySellerId(Long sellerId);
-
 }

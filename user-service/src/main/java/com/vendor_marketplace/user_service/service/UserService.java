@@ -4,7 +4,7 @@ package com.vendor_marketplace.user_service.service;
 import com.vendor_marketplace.user_service.dao.interfaces.UserDao;
 import com.vendor_marketplace.user_service.exception.ExistDataException;
 import com.vendor_marketplace.user_service.exception.ResourceNotFoundException;
-import com.vendor_marketplace.user_service.models.dto.request.RegisterRequest;
+import com.vendor_marketplace.user_service.models.dto.request.UserCreatedEvent;
 import com.vendor_marketplace.user_service.models.dto.request.UpdateUserRequest;
 import com.vendor_marketplace.user_service.models.dto.response.UserResponse;
 import com.vendor_marketplace.user_service.models.entity.Address;
@@ -28,7 +28,7 @@ public class UserService {
     private final UserDao userDao;
 
     @Transactional
-    public UserResponse registerUser(RegisterRequest request) {
+    public UserResponse registerUser(UserCreatedEvent request) {
         log.info("Registering User with : {}", request.getEmail());
         Boolean emailExist = userDao.checkKeycloakOrEmailExist(request.getKeycloakId(),request.getEmail());
 

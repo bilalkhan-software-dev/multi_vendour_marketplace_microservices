@@ -9,11 +9,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SellerCreatedEvents {
+public class SellerCreatedEvent {
 
     private String name;
 
     private String mobile;
+    private String keyCloakId;
 
     private String email;
 

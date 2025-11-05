@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RegisterRequest {
+public class UserCreatedEvent {
 
     private String fullName;
     private String email;
