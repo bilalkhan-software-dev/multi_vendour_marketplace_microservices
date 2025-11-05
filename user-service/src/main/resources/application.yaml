@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/user-service-db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:khan}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+
+admin:
+  info:
+    name: ${ADMIN_NAME:Bilal Khan}
+    email: ${ADMIN_EMAIL:anonymousalwaysalone@gmail.com}
+    mobile: ${ADMIN_MOBILE:03001233445}
+
+server:
+  port: 8080

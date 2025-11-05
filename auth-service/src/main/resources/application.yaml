@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: auth-service
+
+keycloak:
+  auth-server-url: http://localhost:8888
+  realm: vendor-marketplace
+  client-id: auth-service
+  client-secret: ${KEYCLOAK_CLIENT_SECRET}

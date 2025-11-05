@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: seller-service
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/seller-service-db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:khan}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+
+server:
+  port: 8081
