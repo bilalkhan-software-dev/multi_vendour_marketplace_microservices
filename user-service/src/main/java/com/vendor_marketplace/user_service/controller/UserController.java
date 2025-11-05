@@ -1,7 +1,7 @@
 package com.vendor_marketplace.user_service.controller;
 
 import com.vendor_marketplace.user_service.handler.GenericResponseHandler;
-import com.vendor_marketplace.user_service.models.dto.request.RegisterRequest;
+import com.vendor_marketplace.user_service.models.dto.request.UserCreatedEvent;
 import com.vendor_marketplace.user_service.models.dto.request.UpdateUserRequest;
 import com.vendor_marketplace.user_service.models.dto.response.UserResponse;
 import com.vendor_marketplace.user_service.service.UserService;
@@ -23,7 +23,7 @@ class UserController {
     private final GenericResponseHandler response;
 
     @PostMapping("/register")
-    ResponseEntity<?> registerUserSyncMethod(@Valid @RequestBody RegisterRequest request) {
+    ResponseEntity<?> registerUserSyncMethod(@Valid @RequestBody UserCreatedEvent request) {
 
         UserResponse userResponse = userService.registerUser(request);
 

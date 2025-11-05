@@ -2,8 +2,6 @@ package com.vendor_marketplace.seller_service.handler;
 
 import com.vendor_marketplace.seller_service.exception.ExistDataException;
 import com.vendor_marketplace.seller_service.exception.ResourceNotFoundException;
-import com.vendor_marketplace.seller_service.exception.SameStatusUpdateException;
-import com.vendor_marketplace.user_service.handler.GenericResponseHandler;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +25,7 @@ public class GlobalExceptionHandler {
 
     private final GenericResponseHandler response;
 
-    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         List<String> errors = ex.getBindingResult()
                 .getFieldErrors()
@@ -43,26 +42,25 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .toList();
-        log.warn("Validation failed: {}", errors);
+        log.warn("Validation failed with error: {}", errors);
         return response.createErrorResponse("Validation Failed!", errors, HttpStatus.BAD_REQUEST);
     }
-
-
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
         log.warn("Missing http failed: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<?> handleHttpMessageNotSupported(HttpRequestMethodNotSupportedException ex) {
-        log.warn("Missing http failed: {}", ex.getMessage());
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleParamMismatchReadable(MethodArgumentTypeMismatchException ex) {
+        log.warn("Mismatch http failed: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
-
-
-
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<?> handleHttpMessageNotSupported(HttpRequestMethodNotSupportedException ex) {
+        log.warn("Missing http field: {}", ex.getMessage());
+        return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex) {
@@ -76,12 +74,6 @@ public class GlobalExceptionHandler {
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(SameStatusUpdateException.class)
-    public ResponseEntity<?> handleSameUpdateRequestExceptions(SameStatusUpdateException ex) {
-        log.warn("Same status update: {}", ex.getMessage());
-        return response.createBuildResponseMessage(ex.getMessage(), HttpStatus.OK);
-    }
-
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<?> handleMissingParameter(MissingServletRequestParameterException ex) {
         log.warn("Missing request parameter: {}", ex.getMessage());
@@ -93,7 +85,6 @@ public class GlobalExceptionHandler {
         log.warn("Illegal argument: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAll(Exception ex) {
