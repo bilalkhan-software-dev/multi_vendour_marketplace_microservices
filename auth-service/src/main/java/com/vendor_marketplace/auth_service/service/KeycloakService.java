@@ -1,5 +1,8 @@
 package com.vendor_marketplace.auth_service.service;
 
+import com.vendor_marketplace.auth_service.enums.USER_ROLE;
+import com.vendor_marketplace.auth_service.exception.ExistDataException;
+import com.vendor_marketplace.auth_service.exception.KeycloakOperationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
@@ -9,6 +12,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -36,8 +40,12 @@ public class KeycloakService {
     public String createUser(String email, String password, String fullName, String role) {
         // 1. Check if email already exists
         if (isEmailExists(email)) {
-            throw new DuplicateEmailException("Email already registered: " + email);
+            throw new ExistDataException("Email already registered: " + email);
         }
+
+        USER_ROLE role1 = USER_ROLE.ROLE_SELLER;
+        USER_ROLE role2 = USER_ROLE.ROLE_ADMIN;
+        USER_ROLE role3 = USER_ROLE.ROLE_CUSTOMER;
 
         // 2. Create user in Keycloak
         UserRepresentation user = new UserRepresentation();
