@@ -26,9 +26,11 @@ public class Address {
     private String state;
     private String pinCode;
     private String mobile;
-    private String address; // Location Where the order will deliver
+    private String address;
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

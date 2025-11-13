@@ -1,16 +1,16 @@
 package com.vendor_marketplace.seller_service.services.impl;
 
+import com.vendor_marketplace.common.dto.event.SellerCreatedEvent;
 import com.vendor_marketplace.seller_service.dao.interfaces.SellerDao;
 import com.vendor_marketplace.seller_service.exception.ExistDataException;
 import com.vendor_marketplace.seller_service.exception.ResourceNotFoundException;
-import com.vendor_marketplace.seller_service.models.dto.request.SellerCreatedEvent;
 import com.vendor_marketplace.seller_service.models.dto.request.UpdateSellerRequest;
 import com.vendor_marketplace.seller_service.models.dto.response.SellerResponse;
 import com.vendor_marketplace.seller_service.models.entity.BankDetails;
 import com.vendor_marketplace.seller_service.models.entity.BusinessDetails;
 import com.vendor_marketplace.seller_service.models.entity.Seller;
 import com.vendor_marketplace.seller_service.models.entity.SellerAddress;
-import com.vendor_marketplace.seller_service.models.entity.enums.AccountStatus;
+import com.vendor_marketplace.common.dto.enums.AccountStatus;
 import com.vendor_marketplace.seller_service.services.SellerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +33,9 @@ class SellerServiceImpl implements SellerService {
     @Override
     @Transactional
     public SellerResponse registerSeller(SellerCreatedEvent request) {
-        log.info("Seller registered request with email: {} keycloak: {} ", request.getEmail(), request.getKeyCloakId());
+        log.info("Seller registered request with email: {} keycloak: {} ", request.getEmail(), request.getAuthId());
 
-        validateSeller(request.getKeyCloakId(),request.getEmail());
+        validateSeller(request.getAuthId(),request.getEmail(),request.getSTRN());
 
         SellerCreatedEvent.SellerBankDetails bankDetails = request.getBankDetails();
         SellerCreatedEvent.SellerBusinessDetails businessDetails = request.getBusinessDetails();
@@ -43,11 +43,10 @@ class SellerServiceImpl implements SellerService {
 
         Seller seller = Seller.builder()
                 .email(request.getEmail())
-                .keyCloakId(request.getKeyCloakId())
+                .authId(request.getAuthId())
                 .mobile(request.getMobile())
                 .name(request.getName())
                 .STRN(request.getSTRN())
-                .password(request.getPassword())
                 .bankDetails(BankDetails.builder()
                         .accountHolderName(bankDetails.getAccountHolderName())
                         .accountNumber(bankDetails.getAccountNumber())
@@ -76,7 +75,7 @@ class SellerServiceImpl implements SellerService {
 
 
         Seller saved = sellerDao.saveUser(seller);
-        log.info("Seller registered successfully! with email: {} keycloak: {} ", request.getEmail(), request.getKeyCloakId());
+        log.info("Seller registered successfully! with email: {} auth_id: {} ", request.getEmail(), request.getAuthId());
         return buildSellerResponse(saved);
 
     }
@@ -126,43 +125,27 @@ class SellerServiceImpl implements SellerService {
                    return new ResourceNotFoundException("Seller not found with id: " + seller);
                 }
         );
+        validateSeller(existingSeller.getAuthId(),existingSeller.getEmail(),existingSeller.getSTRN());
 
         BeanUtils.copyProperties(updateSellerRequest, existingSeller);
         return buildSellerResponse(sellerDao.saveUser(existingSeller));
     }
 
     @Override
-    public AccountStatus getSellerAccountStatus(Long sellerId) {
-
-
-        Boolean exists = sellerDao.existsById(sellerId);
-        if (!exists) {
-            throw new ResourceNotFoundException("Seller with id: " + sellerId + " not found");
-        }
-
-        return sellerDao.getSellerAccountStatus(sellerId);
+    public boolean isSellerExist(Long id){
+        return sellerDao.existsById(id);
     }
 
     @Override
-    @Transactional
-    public SellerResponse updateSellerAccountStatus(Long sellerId, AccountStatus accountStatus) {
-
-        log.info("Updating seller account status with id: {}",sellerId);
-        Seller existing = sellerDao.findById(sellerId).orElseThrow(
-                () -> new ResourceNotFoundException("Seller with id: " + sellerId + " not found")
-        );
-
-        if (existing.getAccountStatus().equals(accountStatus)) {
-            log.info("Same account status detected. Don't need to update seller account");
-            return buildSellerResponse(existing);
-        }
-
-        existing.setAccountStatus(accountStatus);
-
-        Seller updated = sellerDao.saveUser(existing);
-        log.info("Successfully updated seller account status with id: {}",sellerId);
-        return buildSellerResponse(updated) ;
+    public boolean isSellerExist(String id){
+        return sellerDao.existsByAuthId(id);
     }
+
+
+
+
+
+
 
     private SellerResponse buildSellerResponse(Seller seller){
 
@@ -174,9 +157,8 @@ class SellerServiceImpl implements SellerService {
                 .sellerId(seller.getId())
                 .name(seller.getName())
                 .email(seller.getEmail())
-                .keyCloakId(seller.getKeyCloakId())
+                .authId(seller.getAuthId())
                 .mobile(seller.getMobile())
-                .accountStatus(seller.getAccountStatus())
                 .createdAt(seller.getCreatedAt())
                 .updatedAt(seller.getUpdatedAt())
                 .bankDetails(bankDetails != null ?
@@ -209,16 +191,24 @@ class SellerServiceImpl implements SellerService {
                 .build();
     }
 
-    private void validateSeller(final String keycloakId,final String email ){
-        log.info("Validating Seller registered request with email: {} keycloak: {} ", email,keycloakId);
-        if (keycloakId == null || email == null) {
-            throw new IllegalArgumentException("Keycloak id or email is required");
+    private void validateSeller(final String auth_id,final String email,final String sales_tax_registration_number ){
+        log.info("Validating Seller registered request with email: {} keycloak: {} ", email,auth_id);
+        if (auth_id == null || email == null) {
+            throw new IllegalArgumentException("auth id or email is required");
         }
 
-        Boolean isAlreadyExist = sellerDao.checkKeycloakOrEmailExist(keycloakId ,email);
+
+
+        Boolean isAlreadyExist = sellerDao.checkAuthIdOrEmailExist(auth_id ,email);
         if (isAlreadyExist){
-            log.warn("Validating Seller registered request matches with email: {} keycloak: {}  already exists in our record", email,keycloakId);
-            throw new ExistDataException(String.format("Seller already exist with email: %s or keycloak id: %s", email,keycloakId));
+            log.warn("Validating Seller registered request matches with email: {} auth_Id: {}  already exists in our record", email,auth_id);
+            throw new ExistDataException(String.format("Seller already exist with email: %s or  auth_id: %s", email,auth_id));
+        }
+
+        Boolean existsByStrn = sellerDao.existsByStrn(sales_tax_registration_number);
+        if (existsByStrn){
+            log.warn("Validating Seller registered request matches with sales tax registration number : {} already exists in our record", sales_tax_registration_number);
+            throw new ExistDataException(String.format("Seller already exist with : %s sales tax registration number",sales_tax_registration_number));
         }
     }
 

@@ -11,9 +11,14 @@ public interface UserDao {
     Optional<User> findByEmail(final String email);
     Optional<User> findById(final Long id);
 
-    Boolean checkKeycloakOrEmailExist(final String keycloak,final String email);
+
+    Boolean checkAuthIdOrEmailExist(String keycloak, String email);
 
     Boolean existsById(final Long id);
+
+
+    Boolean existsByAuthId(String id);
+
     User saveUser(final User user);
     Optional<User> getUserById(final Long id);
 

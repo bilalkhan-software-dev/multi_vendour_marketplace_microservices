@@ -16,7 +16,7 @@ public class UserResponse {
     private String fullName;
     private String email;
     private String mobile;
-    private String keyCloakId;
+    private String authId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String role;

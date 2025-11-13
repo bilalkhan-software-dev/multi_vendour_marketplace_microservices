@@ -1,7 +1,6 @@
 package com.vendor_marketplace.seller_service.models.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vendor_marketplace.seller_service.models.entity.enums.AccountStatus;
+import com.vendor_marketplace.common.dto.enums.AccountStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,16 +22,13 @@ public class Seller {
     private Long id;
 
     @Column(unique = true)
-    private String keyCloakId;
+    private String authId;
 
     private String name;
     private String mobile;
 
     @Column(unique = true,nullable = false)
     private String email;
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
 
     @Embedded
     private BankDetails bankDetails = new BankDetails();
@@ -43,6 +39,7 @@ public class Seller {
     @OneToOne(cascade = CascadeType.ALL)
     private SellerAddress pickupAddress;
 
+    @Column(unique = true,nullable = false)
     private String STRN;
     /**
      * STRN (Sales Tax Registration Number):
@@ -50,15 +47,6 @@ public class Seller {
      * Required for businesses that make taxable supplies and must charge sales tax.
      */
 
-
-    @Builder.Default
-    private String role = "ROLE_SELLER";
-
-    @Builder.Default
-    private boolean isEmailVerified =  false;
-
-    @Enumerated(EnumType.STRING)
-    private AccountStatus accountStatus = AccountStatus.PENDING_VERIFICATION;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

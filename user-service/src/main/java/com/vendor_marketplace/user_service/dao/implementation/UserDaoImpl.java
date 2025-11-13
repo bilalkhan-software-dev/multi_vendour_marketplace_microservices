@@ -31,13 +31,18 @@ class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Boolean checkKeycloakOrEmailExist(String keycloak, String email) {
-        return userRepository.existsByKeyCloakIdOrEmail(keycloak,email);
+    public Boolean checkAuthIdOrEmailExist(String keycloak, String email) {
+        return userRepository.existsByAuthIdOrEmail(keycloak,email);
     }
 
     @Override
     public Boolean existsById(Long id) {
         return userRepository.existsById(id);
+    }
+
+    @Override
+    public Boolean existsByAuthId(String id) {
+        return userRepository.existsByAuthId(id);
     }
 
     @Override

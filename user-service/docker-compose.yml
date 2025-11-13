@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:15
-    container_name: microservice-vendor_marketplace-postgres
+    container_name: microservice-vendor_marketplace-user-service-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: user-service-db
@@ -14,18 +14,6 @@ services:
     networks:
       - backend
 
-#  redis:
-#    image: redis:latest
-#    container_name: redis
-#    restart: unless-stopped
-#    ports:
-#      - "6379:6379"
-#    command: [ "redis-server", "--appendonly", "yes" ]
-#    volumes:
-#      - redis_data:/data
-#    networks:
-#      - backend
-
 
 volumes:
   postgres_data:
@@ -33,3 +21,6 @@ volumes:
 networks:
   backend:
     driver: bridge
+  default:
+    external:
+      name: auth-service_kafka-network

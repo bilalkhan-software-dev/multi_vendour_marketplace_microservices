@@ -1,7 +1,8 @@
 package com.vendor_marketplace.user_service.controller;
 
+import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
 import com.vendor_marketplace.user_service.handler.GenericResponseHandler;
-import com.vendor_marketplace.user_service.models.dto.request.UserCreatedEvent;
+import com.vendor_marketplace.user_service.models.dto.request.AddressRequest;
 import com.vendor_marketplace.user_service.models.dto.request.UpdateUserRequest;
 import com.vendor_marketplace.user_service.models.dto.response.UserResponse;
 import com.vendor_marketplace.user_service.service.UserService;
@@ -32,6 +33,17 @@ class UserController {
         }
         return response.createBuildResponse("User registered successfully!", userResponse, HttpStatus.OK);
     }
+
+
+    @PutMapping("/add/address/{id}")
+    ResponseEntity<?> addAddressToUser(@PathVariable Long id, @Valid @RequestBody AddressRequest address) {
+
+        UserResponse userResponse = userService.addAddressToUser(id, address);
+
+        return response.createBuildResponse("Address added successfully!", userResponse, HttpStatus.OK);
+    }
+
+
     @PatchMapping("/update")
     ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserRequest request) {
 
@@ -42,6 +54,7 @@ class UserController {
         }
         return response.createBuildResponse("User updated successfully!", userResponse, HttpStatus.OK);
     }
+
 
     @GetMapping("/{id}")
     ResponseEntity<?> getUserDetails(@PathVariable Long id) {
@@ -74,5 +87,18 @@ class UserController {
 
         return response.createBuildResponseMessage("User deleted successfully with id: " + id, HttpStatus.OK);
     }
+
+    @GetMapping("/validate/id/{id}")
+    ResponseEntity<Boolean> isUserExistById(@PathVariable Long id) {
+        boolean userExistWithById = userService.isUserExistWithById(id);
+        return ResponseEntity.ok(userExistWithById);
+    }
+
+    @GetMapping("/validate/{id}")
+    ResponseEntity<Boolean> isUserExistAuthUserId(@PathVariable String id) {
+        boolean userExistWithById = userService.isUserExistWithById(id);
+        return ResponseEntity.ok(userExistWithById);
+    }
+
 
 }

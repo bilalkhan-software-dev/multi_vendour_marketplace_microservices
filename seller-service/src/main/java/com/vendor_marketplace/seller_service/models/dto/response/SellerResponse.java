@@ -1,6 +1,6 @@
 package com.vendor_marketplace.seller_service.models.dto.response;
 
-import com.vendor_marketplace.seller_service.models.entity.enums.AccountStatus;
+import com.vendor_marketplace.common.dto.enums.AccountStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class SellerResponse {
 
     private Long sellerId;
-    private String keyCloakId;
+    private String authId;
     private String name;
     private String mobile;
     private String email;
