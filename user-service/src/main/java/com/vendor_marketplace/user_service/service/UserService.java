@@ -1,10 +1,12 @@
 package com.vendor_marketplace.user_service.service;
 
 
+import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
 import com.vendor_marketplace.user_service.dao.interfaces.UserDao;
+import com.vendor_marketplace.user_service.dao.repository.UserRepository;
 import com.vendor_marketplace.user_service.exception.ExistDataException;
 import com.vendor_marketplace.user_service.exception.ResourceNotFoundException;
-import com.vendor_marketplace.user_service.models.dto.request.UserCreatedEvent;
+import com.vendor_marketplace.user_service.models.dto.request.AddressRequest;
 import com.vendor_marketplace.user_service.models.dto.request.UpdateUserRequest;
 import com.vendor_marketplace.user_service.models.dto.response.UserResponse;
 import com.vendor_marketplace.user_service.models.entity.Address;
@@ -14,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,29 +25,32 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
+    private final UserRepository userRepository;
 
     private final UserDao userDao;
 
     @Transactional
     public UserResponse registerUser(UserCreatedEvent request) {
         log.info("Registering User with : {}", request.getEmail());
-        Boolean emailExist = userDao.checkKeycloakOrEmailExist(request.getKeycloakId(),request.getEmail());
+        Boolean emailExist = userDao.checkAuthIdOrEmailExist(request.getAuthId(),request.getEmail());
 
         if (emailExist) {
             log.warn("Registering user already exist : {}", request.getEmail());
-            throw new ExistDataException(String.format("User with email: %s or keycloak_id: %s already exist", request.getEmail(),request.getKeycloakId()));
+            throw new ExistDataException(String.format("User with email: %s or auth_id: %s already exist", request.getEmail(),request.getAuthId()));
         }
 
         User user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
-                .password(request.getPassword())
-                .keyCloakId(request.getKeycloakId())
+                .authId(request.getAuthId())
+                .mobile(request.getMobile())
                 .build();
 
         User saved = userDao.saveUser(user);
         return buildUserResponse(saved);
     }
+
+
 
     public UserResponse getUserById(Long id) {
         log.info("Fetching User with id : {}", id);
@@ -68,6 +72,21 @@ public class UserService {
         }
     }
 
+    @Transactional
+    public UserResponse addAddressToUser(Long userId, AddressRequest request) {
+        log.info("Adding address to User with id : {}", userId);
+        User user = userDao.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        Address address = toEntity(request);
+        user.addAddress(address);
+        User updatedUser = userRepository.save(user);
+        log.info("Address added in user with id : {}", updatedUser.getId());
+
+        return buildUserResponse(updatedUser);
+    }
+
+
     public Set<UserResponse.UserAddress> getUserAddress(Long userId){
 
         List<Address> addressesByUserId = userDao.getAddressesByUserId(userId);
@@ -86,6 +105,15 @@ public class UserService {
 
     }
 
+
+    public boolean isUserExistWithById(Long id){
+        return userDao.existsById(id);
+    }
+
+    public boolean isUserExistWithById(String id){
+        return userDao.existsByAuthId(id);
+    }
+
     public List<UserResponse> getAllUsers(){
         return userDao
                 .getAllUsers()
@@ -94,31 +122,23 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-
-
-
-
-
-
     private UserResponse buildUserResponse(User user) {
         return UserResponse.builder()
                 .userId(user.getId())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
-                .keyCloakId(user.getKeyCloakId())
-                .role(user.getRole().toString())
+                .authId(user.getAuthId())
+                .mobile(user.getMobile() != null ? user.getMobile() : "")
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-                .addresses(user.getAddress().size() > 0 ?
-                        user.getAddress().stream().map(address -> buildUserAddressResponse(address))
-                                .collect(Collectors.toSet()) :
-                         Collections.emptySet())
+                .addresses(user.getAddresses().stream().map(this::buildUserAddressResponse)
+                        .collect(Collectors.toSet()))
                 .build();
     }
 
     private UserResponse.UserAddress buildUserAddressResponse(Address address){
         return UserResponse.UserAddress.builder()
-                .userId(address.getUserId())
+                .userId(address.getUser().getId())
                 .name(address.getName())
                 .city(address.getCity())
                 .state(address.getState())
@@ -133,6 +153,16 @@ public class UserService {
 
 
 
+    private Address toEntity(AddressRequest request){
+        return Address.builder()
+                .name(request.getName())
+                .city(request.getCity())
+                .state(request.getState())
+                .pinCode(request.getPinCode())
+                .mobile(request.getMobile())
+                .locality(request.getLocality())
+                .build();
+    }
 
 
 }

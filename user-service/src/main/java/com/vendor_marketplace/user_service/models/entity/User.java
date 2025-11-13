@@ -1,8 +1,6 @@
 package com.vendor_marketplace.user_service.models.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.vendor_marketplace.user_service.models.entity.enums.USER_ROLE;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,26 +16,25 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-@Table(name = "users")
+@Table(name = "users",uniqueConstraints = {
+        @UniqueConstraint(columnNames = "auth_id"),
+        @UniqueConstraint(columnNames = "email")
+})
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
-    private String keyCloakId;
+    @Column(name = "auth_id", nullable = false, unique = true)
+    private String authId;
+
+    @Column(nullable = false, unique = true)
+    private String email;
 
     private String fullName;
 
-    @Column(unique = true, nullable = false)
-    private String email;
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
-
     private String mobile;
-
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -45,11 +42,17 @@ public class User {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @Enumerated(EnumType.STRING)
-    private USER_ROLE role;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Address> addresses = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Set<Address> address = new HashSet<>();
+    public void addAddress(Address address) {
+        addresses.add(address);
+        address.setUser(this);
+    }
 
-
+    public void removeAddress(Address address) {
+        addresses.remove(address);
+        address.setUser(null);
+    }
 }

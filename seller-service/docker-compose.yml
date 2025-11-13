@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:15
-#    container_name: microservice-vendor_marketplace-postgres
+    container_name: microservice-vendor_marketplace-seller-service-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: seller-service-db
@@ -20,3 +20,6 @@ volumes:
 networks:
   backend:
     driver: bridge
+  default:
+    external:
+      name: auth-service_kafka-network

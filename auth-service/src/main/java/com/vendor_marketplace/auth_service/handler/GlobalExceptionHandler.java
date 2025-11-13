@@ -1,5 +1,6 @@
 package com.vendor_marketplace.auth_service.handler;
 
+import com.vendor_marketplace.auth_service.exception.AuthenticationException;
 import com.vendor_marketplace.auth_service.exception.ExistDataException;
 import com.vendor_marketplace.auth_service.exception.ResourceNotFoundException;
 import jakarta.validation.ConstraintViolationException;
@@ -51,11 +52,13 @@ public class GlobalExceptionHandler {
         log.warn("Missing http failed: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<?> handleParamMismatchReadable(MethodArgumentTypeMismatchException ex) {
         log.warn("Mismatch http failed: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<?> handleHttpMessageNotSupported(HttpRequestMethodNotSupportedException ex) {
         log.warn("Missing http field: {}", ex.getMessage());
@@ -66,6 +69,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleNotFound(ResourceNotFoundException ex) {
         log.warn("Resource not found: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<?> handleAuthenticationException(AuthenticationException ex) {
+        log.warn("Authentication error: {}", ex.getMessage());
+        return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ExistDataException.class)

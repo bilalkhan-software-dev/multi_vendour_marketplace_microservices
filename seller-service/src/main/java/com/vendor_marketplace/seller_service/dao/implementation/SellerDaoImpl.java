@@ -1,13 +1,9 @@
 package com.vendor_marketplace.seller_service.dao.implementation;
 
 import com.vendor_marketplace.seller_service.dao.interfaces.SellerDao;
-import com.vendor_marketplace.seller_service.dao.repository.SellerAddressRepository;
 import com.vendor_marketplace.seller_service.dao.repository.SellerRepository;
 import com.vendor_marketplace.seller_service.models.entity.Seller;
-import com.vendor_marketplace.seller_service.models.entity.SellerAddress;
-import com.vendor_marketplace.seller_service.models.entity.enums.AccountStatus;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,13 +29,23 @@ class SellerDaoImpl implements SellerDao {
 
 
     @Override
-    public Boolean checkKeycloakOrEmailExist(String keycloak, String email) {
-        return sellerRepository.existsByKeyCloakIdOrEmail(keycloak, email);
+    public Boolean checkAuthIdOrEmailExist(String keycloak, String email) {
+        return sellerRepository.existsByAuthIdOrEmail(keycloak, email);
     }
 
     @Override
     public Boolean existsById(Long id) {
         return sellerRepository.existsById(id);
+    }
+
+    @Override
+    public Boolean existsByAuthId(String id) {
+        return sellerRepository.existsByAuthId(id);
+    }
+
+    @Override
+    public Boolean existsByStrn(String strn) {
+        return sellerRepository.existsBySTRN(strn);
     }
 
     @Override
@@ -60,8 +66,5 @@ class SellerDaoImpl implements SellerDao {
     }
 
 
-    @Override
-    public AccountStatus getSellerAccountStatus(Long sellerId) {
-        return sellerRepository.getSellerAccountStatus(sellerId);
-    }
+
 }

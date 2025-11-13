@@ -1,9 +1,8 @@
 package com.vendor_marketplace.seller_service.services;
 
-import com.vendor_marketplace.seller_service.models.dto.request.SellerCreatedEvent;
+import com.vendor_marketplace.common.dto.event.SellerCreatedEvent;
 import com.vendor_marketplace.seller_service.models.dto.request.UpdateSellerRequest;
 import com.vendor_marketplace.seller_service.models.dto.response.SellerResponse;
-import com.vendor_marketplace.seller_service.models.entity.enums.AccountStatus;
 
 import java.util.List;
 
@@ -18,9 +17,11 @@ public interface SellerService {
     SellerResponse getSellerById(Long sellerId);
     SellerResponse updateSeller(Long seller, UpdateSellerRequest updateSellerRequest);
 
-    AccountStatus getSellerAccountStatus(Long sellerId);
+    boolean isSellerExist(Long id);
 
-    SellerResponse updateSellerAccountStatus(Long sellerId, AccountStatus accountStatus);
+    boolean isSellerExist(String id);
+
+
 
 
 
