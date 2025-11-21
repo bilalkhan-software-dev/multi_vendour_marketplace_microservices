@@ -31,9 +31,11 @@ public class SecurityConfig {
                                 "/api/v2/auth/check-email/**",
                                 "/actuator/health",
                                 "/swagger-ui/**",
+                                "/api/v2/products/query/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .pathMatchers("/api/v2/admin/**").hasRole("ADMIN")
+                        .pathMatchers("/api/v2/products/command/**").hasAnyRole("SELLER","ADMIN")
                         .pathMatchers("/api/v2/seller/**").hasAnyRole("SELLER", "ADMIN")
                         .pathMatchers("/api/v2/user/**").hasAnyRole("CUSTOMER", "ADMIN")
                         .anyExchange().authenticated()

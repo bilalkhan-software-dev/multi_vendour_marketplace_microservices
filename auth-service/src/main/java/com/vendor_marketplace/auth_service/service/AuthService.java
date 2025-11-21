@@ -2,8 +2,8 @@ package com.vendor_marketplace.auth_service.service;
 
 import com.vendor_marketplace.auth_service.dao.interfaces.AuthUserDao;
 import com.vendor_marketplace.auth_service.exception.AuthenticationException;
-import com.vendor_marketplace.auth_service.exception.ExistDataException;
-import com.vendor_marketplace.auth_service.exception.ResourceNotFoundException;
+import com.vendor_marketplace.common.exception.ExistDataException;
+import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.common.helper.EmailSendingTemplate;
 import com.vendor_marketplace.auth_service.mapper.AuthUserMapper;
 import com.vendor_marketplace.auth_service.models.dto.request.LoginRequest;

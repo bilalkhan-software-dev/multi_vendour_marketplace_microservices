@@ -1,7 +1,7 @@
 package com.vendor_marketplace.seller_service.services;
 
 import com.vendor_marketplace.common.dto.event.SellerCreatedEvent;
-import com.vendor_marketplace.seller_service.exception.ExistDataException;
+import com.vendor_marketplace.common.exception.ExistDataException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.DltHandler;
@@ -60,9 +60,12 @@ public class SellerConsumerService {
     public void listenDLT(SellerCreatedEvent event,
                           @Header(KafkaHeaders.RECEIVED_KEY) String key,
                           @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
-                          @Header(KafkaHeaders.OFFSET) Long offset
+                          @Header(KafkaHeaders.OFFSET) Long offset,
+                          Acknowledgment acknowledgment
     ) {
         log.info("Received SellerCreatedEvent DLT - Key: {}, Partition: {}, Offset: {}, Email: {}",key,partition,offset,event.getEmail());
-        sellerService.registerSeller(event);
+        log.info("Event: {}",event);
+//        sellerService.registerSeller(event);
+        acknowledgment.acknowledge();
     }
 }

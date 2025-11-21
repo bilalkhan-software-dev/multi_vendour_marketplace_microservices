@@ -18,6 +18,17 @@ spring:
               uri: lb://SELLER-SERVICE
               predicates:
                 - Path=/api/v2/seller/**
+
+            - id: product-command-service
+              uri: lb://PRODUCT-COMMAND-SERVICE
+              predicates:
+                  - Path=/api/v2/products/command/**
+
+            - id: product-query-service
+              uri: lb://PRODUCT-QUERY-SERVICE
+              predicates:
+                  - Path=/api/v2/products/**
+
 eureka:
   client:
     service-url:

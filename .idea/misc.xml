@@ -13,6 +13,8 @@
         <option value="$PROJECT_DIR$/notification-service/pom.xml" />
         <option value="$PROJECT_DIR$/common_dto/pom.xml" />
         <option value="$PROJECT_DIR$/common/pom.xml" />
+        <option value="$PROJECT_DIR$/product-command-service/pom.xml" />
+        <option value="$PROJECT_DIR$/product-query-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

@@ -2,17 +2,15 @@ package com.vendor_marketplace.seller_service.controller;
 
 
 import com.vendor_marketplace.common.dto.event.SellerCreatedEvent;
+import com.vendor_marketplace.common.dto.response.PagedResponse;
+import com.vendor_marketplace.common.dto.response.SellerResponse;
 import com.vendor_marketplace.seller_service.handler.GenericResponseHandler;
 import com.vendor_marketplace.seller_service.models.dto.request.UpdateSellerRequest;
-import com.vendor_marketplace.seller_service.models.dto.response.SellerResponse;
-import com.vendor_marketplace.common.dto.enums.AccountStatus;
 import com.vendor_marketplace.seller_service.services.SellerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v2/seller")
@@ -44,16 +42,22 @@ public class SellerController {
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     ResponseEntity<?> getSellerById(@PathVariable Long id) {
         SellerResponse sellerResponse = sellerService.getSellerById(id);
         return response.createBuildResponse("Seller found successfully!", sellerResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/sellers")
-    ResponseEntity<?> getAllSellers() {
-        List<SellerResponse> sellerResponse = sellerService.getAllSellers();
+    @GetMapping("/{id}")
+    ResponseEntity<?> getSellerById(@PathVariable String id) {
+        SellerResponse sellerResponse = sellerService.getSellerByAuthId(id);
+        return response.createBuildResponse("Seller details retrieved successfully!", sellerResponse, HttpStatus.OK);
+    }
 
+
+    @GetMapping("/sellers")
+    ResponseEntity<?> getAllSellers(@RequestParam(required = false, defaultValue = "0") Integer pageNo) {
+        PagedResponse<SellerResponse> sellerResponse = sellerService.getAllSellers(pageNo);
         return response.createBuildResponse("Sellers found successfully!", sellerResponse, HttpStatus.OK);
     }
 

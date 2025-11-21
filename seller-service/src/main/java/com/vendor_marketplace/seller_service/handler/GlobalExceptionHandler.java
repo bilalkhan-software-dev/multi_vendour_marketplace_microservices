@@ -1,7 +1,7 @@
 package com.vendor_marketplace.seller_service.handler;
 
-import com.vendor_marketplace.seller_service.exception.ExistDataException;
-import com.vendor_marketplace.seller_service.exception.ResourceNotFoundException;
+import com.vendor_marketplace.common.exception.ExistDataException;
+import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

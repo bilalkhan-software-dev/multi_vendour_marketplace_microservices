@@ -1,7 +1,7 @@
 package com.vendor_marketplace.user_service.service;
 
 import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
-import com.vendor_marketplace.user_service.exception.ExistDataException;
+import com.vendor_marketplace.common.exception.ExistDataException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.DltHandler;
@@ -65,7 +65,8 @@ public class UserConsumerService {
                           Acknowledgment acknowledgment
     ) {
         log.info("Received UserCreatedEvent DLT - Key: {}, Partition: {}, Offset: {}, Email: {}", key, partition, offset, event.getEmail());
-        userService.registerUser(event);
+//        userService.registerUser(event);
+        log.info("Event: {}",event);
         acknowledgment.acknowledge();
     }
 }

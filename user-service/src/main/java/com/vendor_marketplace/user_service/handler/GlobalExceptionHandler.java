@@ -1,7 +1,7 @@
 package com.vendor_marketplace.user_service.handler;
 
-import com.vendor_marketplace.user_service.exception.ExistDataException;
-import com.vendor_marketplace.user_service.exception.ResourceNotFoundException;
+import com.vendor_marketplace.common.exception.ExistDataException;
+import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.user_service.exception.SameStatusUpdateException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({ExistDataException.class})
+    @ExceptionHandler(ExistDataException.class)
     public ResponseEntity<?> handleConflict(ExistDataException ex) {
         log.warn("Data conflict: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.CONFLICT);

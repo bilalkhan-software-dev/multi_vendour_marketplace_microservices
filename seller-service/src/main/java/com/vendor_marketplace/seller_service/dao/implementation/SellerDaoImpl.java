@@ -4,6 +4,8 @@ import com.vendor_marketplace.seller_service.dao.interfaces.SellerDao;
 import com.vendor_marketplace.seller_service.dao.repository.SellerRepository;
 import com.vendor_marketplace.seller_service.models.entity.Seller;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,11 @@ class SellerDaoImpl implements SellerDao {
     @Override
     public Optional<Seller> findById(Long id) {
         return sellerRepository.findById(id);
+    }
+
+    @Override
+    public Optional<Seller> findByAuthId(String id) {
+        return sellerRepository.findByAuthId(id);
     }
 
 
@@ -56,8 +63,8 @@ class SellerDaoImpl implements SellerDao {
 
 
     @Override
-    public List<Seller> getAllUsers() {
-        return sellerRepository.findAll();
+    public Page<Seller> getAllUsers(Pageable pageable) {
+        return sellerRepository.findAll(pageable);
     }
 
     @Override
