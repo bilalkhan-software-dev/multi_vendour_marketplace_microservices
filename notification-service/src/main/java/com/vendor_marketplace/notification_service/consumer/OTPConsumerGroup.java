@@ -46,7 +46,7 @@ public class OTPConsumerGroup {
             Acknowledgment acknowledgment) {
 
         try {
-            log.info("Received UserCreatedEvent - Key: {}, Partition: {}, Offset: {}, Email: {}",
+            log.info("Received SendOTPEvent - Key: {}, Partition: {}, Offset: {}, Email: {}",
                     key, partition, offset, event.getTo());
 
             // Process the event

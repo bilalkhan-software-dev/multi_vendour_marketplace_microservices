@@ -2,6 +2,7 @@ package com.vendor_marketplace.user_service.dao.interfaces;
 
 import com.vendor_marketplace.user_service.models.entity.Address;
 import com.vendor_marketplace.user_service.models.entity.User;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +25,7 @@ public interface UserDao {
 
     void deleteUserById(Long id);
 
-    List<User> getAllUsers();
+    Page<User> getAllUsers(Integer pageNo);
 
     List<Address> getAddressesByUserId(final Long userId);
 }

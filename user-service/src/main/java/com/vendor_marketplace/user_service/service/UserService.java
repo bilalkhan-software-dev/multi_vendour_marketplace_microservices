@@ -2,10 +2,11 @@ package com.vendor_marketplace.user_service.service;
 
 
 import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
+import com.vendor_marketplace.common.dto.response.PagedResponse;
+import com.vendor_marketplace.common.exception.ExistDataException;
+import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.user_service.dao.interfaces.UserDao;
 import com.vendor_marketplace.user_service.dao.repository.UserRepository;
-import com.vendor_marketplace.user_service.exception.ExistDataException;
-import com.vendor_marketplace.user_service.exception.ResourceNotFoundException;
 import com.vendor_marketplace.user_service.models.dto.request.AddressRequest;
 import com.vendor_marketplace.user_service.models.dto.request.UpdateUserRequest;
 import com.vendor_marketplace.user_service.models.dto.response.UserResponse;
@@ -14,6 +15,7 @@ import com.vendor_marketplace.user_service.models.entity.User;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -114,12 +116,24 @@ public class UserService {
         return userDao.existsByAuthId(id);
     }
 
-    public List<UserResponse> getAllUsers(){
-        return userDao
-                .getAllUsers()
-                .stream()
-                .map(this::buildUserResponse)
-                .collect(Collectors.toList());
+    public PagedResponse<UserResponse> getAllUsers(Integer pageNo){
+
+
+        Page<User> allUsers = userDao.getAllUsers(pageNo);
+
+        List<UserResponse> users = allUsers.getContent().stream().map(this::buildUserResponse).toList();
+
+        return PagedResponse.<UserResponse>builder()
+                .content(users)
+                .totalPages(allUsers.getTotalPages())
+                .totalElements(allUsers.getTotalElements())
+                .pageNumber(allUsers.getNumber())
+                .pageSize(allUsers.getSize())
+                .isFirstPage(allUsers.isFirst())
+                .isLastPage(allUsers.isLast())
+                .build();
+
+
     }
 
     private UserResponse buildUserResponse(User user) {

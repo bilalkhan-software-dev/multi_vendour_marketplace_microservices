@@ -71,33 +71,17 @@ public class KafkaConsumerConfig {
         return new DeadLetterPublishingRecoverer(template);
     }
 
-    /**
-     *  Error handler configuration with retry & DLT
-     */
-    @Bean
-    public DefaultErrorHandler errorHandler(DeadLetterPublishingRecoverer recoverer) {
-        // Retry each failed record 3 times with 2-second delay
-        FixedBackOff backOff = new FixedBackOff(2000L, 3L);
-        DefaultErrorHandler handler = new DefaultErrorHandler(recoverer, backOff);
-
-        // Optional: ignore specific exception types (e.g., ValidationException)
-        // handler.addNotRetryableExceptions(CustomBusinessException.class);
-
-        return handler;
-    }
 
     /**
      *  Kafka listener container factory
      */
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory(
-            DefaultErrorHandler errorHandler) {
+    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
 
         ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
 
         factory.setConsumerFactory(consumerFactory());
-        factory.setCommonErrorHandler(errorHandler);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }

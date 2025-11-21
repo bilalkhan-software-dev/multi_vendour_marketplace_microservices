@@ -1,6 +1,7 @@
 package com.vendor_marketplace.user_service.controller;
 
 import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
+import com.vendor_marketplace.common.dto.response.PagedResponse;
 import com.vendor_marketplace.user_service.handler.GenericResponseHandler;
 import com.vendor_marketplace.user_service.models.dto.request.AddressRequest;
 import com.vendor_marketplace.user_service.models.dto.request.UpdateUserRequest;
@@ -12,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -73,9 +73,9 @@ class UserController {
     }
 
     @GetMapping("/users")
-    ResponseEntity<?> getUsers() {
+    ResponseEntity<?> getUsers(@RequestParam(required = false,defaultValue = "0") Integer pageNo) {
 
-        List<UserResponse> allUsers = userService.getAllUsers();
+        PagedResponse<UserResponse> allUsers = userService.getAllUsers(pageNo);
 
         return response.createBuildResponse("Users retrieved successfully!", allUsers, HttpStatus.OK);
     }

@@ -1,21 +1,25 @@
 package com.vendor_marketplace.seller_service.services.impl;
 
 import com.vendor_marketplace.common.dto.event.SellerCreatedEvent;
+import com.vendor_marketplace.common.dto.response.PagedResponse;
+import com.vendor_marketplace.common.dto.response.SellerResponse;
 import com.vendor_marketplace.seller_service.dao.interfaces.SellerDao;
-import com.vendor_marketplace.seller_service.exception.ExistDataException;
-import com.vendor_marketplace.seller_service.exception.ResourceNotFoundException;
+import com.vendor_marketplace.common.exception.ExistDataException;
+import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.seller_service.models.dto.request.UpdateSellerRequest;
-import com.vendor_marketplace.seller_service.models.dto.response.SellerResponse;
 import com.vendor_marketplace.seller_service.models.entity.BankDetails;
 import com.vendor_marketplace.seller_service.models.entity.BusinessDetails;
 import com.vendor_marketplace.seller_service.models.entity.Seller;
 import com.vendor_marketplace.seller_service.models.entity.SellerAddress;
-import com.vendor_marketplace.common.dto.enums.AccountStatus;
 import com.vendor_marketplace.seller_service.services.SellerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -81,14 +85,27 @@ class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public List<SellerResponse> getAllSellers() {
+    public PagedResponse<SellerResponse> getAllSellers(Integer pageNo) {
 
-        List<Seller> allUsers = sellerDao.getAllUsers();
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(pageNo,12,sort);
 
-        return allUsers.stream()
+        Page<Seller> allUsers = sellerDao.getAllUsers(pageable);
+
+        List<SellerResponse> sellers = allUsers.getContent().stream()
                 .map(this::buildSellerResponse
                 )
-                .collect(Collectors.toList());
+                .toList();
+
+        return PagedResponse.<SellerResponse>builder()
+                .content(sellers)
+                .isFirstPage(allUsers.isFirst())
+                .isLastPage(allUsers.isLast())
+                .pageNumber(allUsers.getNumber())
+                .pageSize(allUsers.getSize())
+                .totalElements(allUsers.getTotalElements())
+                .totalPages(allUsers.getTotalPages())
+                .build();
     }
 
     @Override
@@ -132,6 +149,13 @@ class SellerServiceImpl implements SellerService {
     }
 
     @Override
+    public SellerResponse getSellerByAuthId(String id) {
+        return buildSellerResponse(sellerDao.findByAuthId(id).orElseThrow(
+                () -> new ResourceNotFoundException("Seller not found")
+        ));
+    }
+
+    @Override
     public boolean isSellerExist(Long id){
         return sellerDao.existsById(id);
     }
@@ -140,11 +164,6 @@ class SellerServiceImpl implements SellerService {
     public boolean isSellerExist(String id){
         return sellerDao.existsByAuthId(id);
     }
-
-
-
-
-
 
 
     private SellerResponse buildSellerResponse(Seller seller){
@@ -158,6 +177,7 @@ class SellerServiceImpl implements SellerService {
                 .name(seller.getName())
                 .email(seller.getEmail())
                 .authId(seller.getAuthId())
+                .sales_tax_registration_number(seller.getSTRN())
                 .mobile(seller.getMobile())
                 .createdAt(seller.getCreatedAt())
                 .updatedAt(seller.getUpdatedAt())

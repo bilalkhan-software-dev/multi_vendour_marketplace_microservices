@@ -7,6 +7,10 @@ import com.vendor_marketplace.user_service.models.entity.Address;
 import com.vendor_marketplace.user_service.models.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -61,8 +65,12 @@ class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllUsers(Integer pageNo) {
+
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable = PageRequest.of(pageNo, 10,sort);
+
+        return userRepository.findAll(pageable);
     }
 
 
