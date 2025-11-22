@@ -31,6 +31,6 @@ public class ProductUpdateRequest {
     private Integer mrpPrice;
 
     private List<@NotBlank(message = "Image URL cannot be blank") String> images;
-    private List<@NotBlank(message = "Color cannot be blank or empty") String> colors;
-    private List<@NotBlank(message = "Sizes cannot be blank or empty") String> sizes;
+    private String colors;
+    private String sizes;
 }

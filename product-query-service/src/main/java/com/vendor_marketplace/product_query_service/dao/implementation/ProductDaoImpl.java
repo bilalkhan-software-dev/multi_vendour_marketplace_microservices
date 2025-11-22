@@ -74,27 +74,17 @@ class ProductDaoImpl implements ProductDao {
 
         // Filter by brand
         if (hasValue(brand)) {
-            conditions.add(Criteria.where("brand").is(brand.toLowerCase()));
+            conditions.add(Criteria.where("brand").is(brand));
         }
 
         // Filter by colors
         if (hasValue(colors)) {
-            List<String> colorList = Stream.of(colors.split(","))
-                    .map(String::trim)
-                    .map(String::toLowerCase)
-                    .toList();
-
-            conditions.add(Criteria.where("colors").in(colorList));
+            conditions.add(Criteria.where("colors").is(colors));
         }
 
         // Filter by sizes
         if (hasValue(sizes)) {
-            List<String> sizeList = Stream.of(sizes.split(","))
-                    .map(String::trim)
-                    .map(String::toLowerCase)
-                    .toList();
-
-            conditions.add(Criteria.where("sizes").in(sizeList));
+            conditions.add(Criteria.where("sizes").is(sizes));
         }
 
         // Price range filter

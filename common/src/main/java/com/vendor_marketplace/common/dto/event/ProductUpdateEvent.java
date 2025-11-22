@@ -24,7 +24,7 @@ public class ProductUpdateEvent {
     private Integer mrpPrice;
 
     private List<String> images;
-    private List<String> colors;
-    private List<String> sizes;
+    private String colors;
+    private String sizes;
 
 }

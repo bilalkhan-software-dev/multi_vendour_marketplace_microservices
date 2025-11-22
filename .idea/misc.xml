@@ -15,6 +15,7 @@
         <option value="$PROJECT_DIR$/common/pom.xml" />
         <option value="$PROJECT_DIR$/product-command-service/pom.xml" />
         <option value="$PROJECT_DIR$/product-query-service/pom.xml" />
+        <option value="$PROJECT_DIR$/cart-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

@@ -38,9 +38,9 @@ public class ProductCreateEvent {
 
     private List<String> images;
 
-    private List<String> colors;
+    private String colors;
 
-    private List<String> sizes;
+    private String sizes;
 
 
 

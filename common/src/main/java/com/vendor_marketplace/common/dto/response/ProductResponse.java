@@ -31,8 +31,8 @@ public class ProductResponse {
 
     @Builder.Default
     private List<String> images = new ArrayList<>();
-    private List<String> color = new ArrayList<>();
-    private List<String> sizes = new ArrayList<>();
+    private String colors;
+    private String sizes;
 
 
     private ProductCategory category;
