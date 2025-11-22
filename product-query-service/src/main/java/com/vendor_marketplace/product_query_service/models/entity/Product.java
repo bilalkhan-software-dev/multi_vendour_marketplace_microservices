@@ -42,7 +42,7 @@ public class Product {
     @Builder.Default
     private int stocks = 0;
 
-    private List<String> colors;
+    private String colors;
 
     /**
      * Seller Business name
@@ -64,7 +64,7 @@ public class Product {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    private List<String> sizes;
+    private String sizes;
 
 
 }

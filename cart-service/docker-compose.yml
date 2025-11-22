@@ -1,0 +1,16 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cart-service-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: cart-service-db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 1234567
+    ports:
+      - "3306:3306"
+    volumes:
+      - cart_mysql_data:/var/lib/mysql
+
+volumes:
+  cart_mysql_data:

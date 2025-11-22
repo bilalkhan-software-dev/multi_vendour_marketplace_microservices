@@ -1,0 +1,18 @@
+package com.vendor_marketplace.cart_service.feignClient;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.Map;
+
+@FeignClient(name = "product-query-service",url = "http://localhost:8085/api/v2/products/query")
+public interface ThirdPartyProductService {
+
+    @GetMapping("/{id}")
+    ResponseEntity<Map<String,Object>> getProductDetails(@PathVariable String id);
+
+
+
+}

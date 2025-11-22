@@ -46,8 +46,8 @@ public class ProductCreateRequest {
     private List<@NotBlank(message = "Image URL cannot be blank") String> images;
 
     @NotEmpty(message = "Color is required")
-    private List<@NotBlank(message = "At least one color is required") String> colors;
+    private String colors;
 
     @NotEmpty(message = "Size is required")
-    private List<@NotBlank(message = "At least one size is required") String> sizes;
+    private String sizes;
 }

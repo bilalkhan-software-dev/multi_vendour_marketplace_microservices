@@ -24,11 +24,6 @@ spring:
 jwt:
   secret:
     key: 6pQm/8nXkz1uD0mU5wXrZ4qV9rG7dJk8aLfP9nQw1yZ2xThB9cN4qR5vY7uK3mP0
-#keycloak:
-#  server-url: http://localhost:8888
-#  realm: vendor-marketplace
-#  client-id: auth-service-admin-client
-#  client-secret: oKwJkqqg3utcJlL2PDjbCdWcGGbjoukd
 
 eureka:
   client:

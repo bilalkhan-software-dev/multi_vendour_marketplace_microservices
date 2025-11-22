@@ -19,7 +19,7 @@ public class ProductMapper {
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .images(product.getImages())
-                .color(product.getColors())
+                .colors(product.getColors())
                 .sizes(product.getSizes())
                 .brand(product.getBrand())
                 .sellerId(product.getSellerId())
