@@ -16,4 +16,14 @@ public class KafkaTopicsConstant {
     public static final String PRODUCT_DELETE_TOPIC = "product-delete-topic";
 
     public static final String PRODUCT_UPDATE_STOCK_TOPIC = "product-update-stock-topic";
+
+    public static final String TRANSACTION_CREATED_TOPIC = "transaction-created-topic";
+    public static final String SELLER_REPORT_TOPIC = "seller-report-topic";
+
+    /**
+     * We don't need this SELLER_REPORT_TOPIC also handle for order cancel then update refund and order cancel value
+     * public static final String SELLER_REPORT_ORDER_CANCEL_TOPIC = "seller-report-order-cancel-topic";
+     */
+
+
 }
