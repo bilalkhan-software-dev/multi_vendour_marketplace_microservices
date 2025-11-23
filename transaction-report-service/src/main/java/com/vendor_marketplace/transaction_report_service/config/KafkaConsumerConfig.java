@@ -1,4 +1,4 @@
-package com.vendor_marketplace.product_query_service.config;
+package com.vendor_marketplace.transaction_report_service.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -11,8 +11,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,12 +22,9 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    /**
-     *  Generic Consumer Factory (handles multiple DTO types dynamically)
-     */
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
-        JsonDeserializer<Object> deserializer = new JsonDeserializer<>();
+        JacksonJsonDeserializer<Object> deserializer = new JacksonJsonDeserializer<>();
         deserializer.addTrustedPackages("com.vendor_marketplace.common.dto.event");
         deserializer.setRemoveTypeHeaders(false);
         deserializer.setUseTypeMapperForKey(false);
@@ -42,16 +38,12 @@ public class KafkaConsumerConfig {
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
 
-
-    /**
-     *  Producer Factory for DLT publishing (used internally by recoverer)
-     */
     @Bean
     public ProducerFactory<Object, Object> producerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class);
         return new DefaultKafkaProducerFactory<>(props);
     }
 
@@ -60,25 +52,15 @@ public class KafkaConsumerConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
-    /**
-     *  Dead Letter Recoverer: sends failed records to topic-name-dlt
-     */
     @Bean
     public DeadLetterPublishingRecoverer deadLetterPublishingRecoverer(KafkaTemplate<Object, Object> template) {
-        // Default DLT topic name: <original-topic>-dlt
         return new DeadLetterPublishingRecoverer(template);
     }
 
-
-    /**
-     *  Kafka listener container factory
-     */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
-
         ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
-
         factory.setConsumerFactory(consumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;

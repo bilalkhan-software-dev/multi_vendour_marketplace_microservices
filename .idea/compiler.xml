@@ -12,7 +12,7 @@
         <module name="eureka" />
         <module name="gateway" />
       </profile>
-      <profile name="Annotation profile for cart-service" enabled="true">
+      <profile name="Annotation profile for transaction-report-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -23,11 +23,15 @@
         <module name="cart-service" />
         <module name="auth-service" />
         <module name="product-command-service" />
-        <module name="seller-service" />
         <module name="user-service" />
+        <module name="seller-service" />
+        <module name="transaction-report-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="transation-report-service" target="1.5" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -41,6 +45,7 @@
       <module name="product-command-service" options="-parameters" />
       <module name="product-query-service" options="-parameters" />
       <module name="seller-service" options="-parameters" />
+      <module name="transaction-report-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>
