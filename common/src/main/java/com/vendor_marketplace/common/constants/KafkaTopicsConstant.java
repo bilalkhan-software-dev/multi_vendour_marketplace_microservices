@@ -21,9 +21,18 @@ public class KafkaTopicsConstant {
     public static final String SELLER_REPORT_TOPIC = "seller-report-topic";
 
     /**
-     * We don't need this SELLER_REPORT_TOPIC also handle for order cancel then update refund and order cancel value
+     * We don't need this SELLER_REPORT_ORDER_CANCEL_TOPIC also handle for order cancel then update refund and order cancel value
      * public static final String SELLER_REPORT_ORDER_CANCEL_TOPIC = "seller-report-order-cancel-topic";
      */
+
+    public static final String ORDER_CREATED_TOPIC = "order-created-topic";
+
+    public static final String PAYMENT_SUCCESS_TOPIC = "payment-success-topic";
+
+    /**
+     * Either payment failed or payment cancel then publish this topic
+     */
+    public static final String PAYMENT_FAILED_TOPIC = "order-failed-topic";
 
 
 }

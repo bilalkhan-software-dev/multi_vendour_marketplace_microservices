@@ -12,7 +12,7 @@
         <module name="eureka" />
         <module name="gateway" />
       </profile>
-      <profile name="Annotation profile for transaction-report-service" enabled="true">
+      <profile name="Annotation profile for order-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -22,7 +22,9 @@
         <module name="product-query-service" />
         <module name="cart-service" />
         <module name="auth-service" />
+        <module name="payment-service" />
         <module name="product-command-service" />
+        <module name="order-service" />
         <module name="user-service" />
         <module name="seller-service" />
         <module name="transaction-report-service" />
@@ -42,6 +44,8 @@
       <module name="eureka" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="notification-service" options="-parameters" />
+      <module name="order-service" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
       <module name="product-command-service" options="-parameters" />
       <module name="product-query-service" options="-parameters" />
       <module name="seller-service" options="-parameters" />

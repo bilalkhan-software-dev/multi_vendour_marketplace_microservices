@@ -1,8 +1,10 @@
 package com.vendor_marketplace.user_service.dao.implementation;
 
+import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.user_service.dao.interfaces.UserDao;
 import com.vendor_marketplace.user_service.dao.repository.AddressRepository;
 import com.vendor_marketplace.user_service.dao.repository.UserRepository;
+import com.vendor_marketplace.user_service.models.dto.response.UserAddressResponse;
 import com.vendor_marketplace.user_service.models.entity.Address;
 import com.vendor_marketplace.user_service.models.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,7 @@ class UserDaoImpl implements UserDao {
 
     @Override
     public Boolean checkAuthIdOrEmailExist(String keycloak, String email) {
-        return userRepository.existsByAuthIdOrEmail(keycloak,email);
+        return userRepository.existsByAuthIdOrEmail(keycloak, email);
     }
 
     @Override
@@ -51,7 +53,7 @@ class UserDaoImpl implements UserDao {
 
     @Override
     public User saveUser(User user) {
-       return userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Override
@@ -60,7 +62,7 @@ class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void deleteUserById(Long id){
+    public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
 
@@ -68,7 +70,7 @@ class UserDaoImpl implements UserDao {
     public Page<User> getAllUsers(Integer pageNo) {
 
         Sort sort = Sort.by("createdAt").descending();
-        Pageable pageable = PageRequest.of(pageNo, 10,sort);
+        Pageable pageable = PageRequest.of(pageNo, 10, sort);
 
         return userRepository.findAll(pageable);
     }
@@ -79,6 +81,12 @@ class UserDaoImpl implements UserDao {
         return addressRepository.findByUserId(userId);
     }
 
+    @Override
+    public UserAddressResponse getAddressById(Long id) {
+        return addressRepository.findUserAddressById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Address with id: " + id + " not found")
+        );
+    }
 
 
 }

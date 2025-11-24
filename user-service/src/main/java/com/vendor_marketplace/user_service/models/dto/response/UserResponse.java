@@ -1,14 +1,16 @@
 package com.vendor_marketplace.user_service.models.dto.response;
 
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class UserResponse {
 
@@ -22,24 +24,8 @@ public class UserResponse {
     private String role;
 
     @Builder.Default
-    private Set<UserAddress> addresses = new HashSet<>();
+    private Set<UserAddressResponse> addresses = new HashSet<>();
 
-
-    @Data
-    @Builder
-    public static class UserAddress{
-        private Long id;
-        private String name;
-        private String locality;
-        private String city;
-        private String state;
-        private String pinCode;
-        private String mobile;
-        private String address;
-        private Long userId;
-        private LocalDateTime createdAt;
-        private LocalDateTime updatedAt;
-    }
 
 
 }

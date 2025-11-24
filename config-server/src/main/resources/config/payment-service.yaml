@@ -1,0 +1,36 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:29093
+    consumer:
+      group-id: payment-service-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://localhost:5436/payment-service-db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:khan}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+  success-url: http://localhost:8089/api/v2/wehbook/stripe/success?paymentId={PAYMENT_ID}
+  cancel-url: http://localhost:8089/api/v2/wehbook/stripe/cancel?paymentId={PAYMENT_ID}
+  currency: usd
+
+
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+server:
+  port: 8089
