@@ -16,6 +16,7 @@ public class OrderCreatedEvent {
     private Integer totalAmount;
     private PaymentMethod paymentMethod;
     private String customerId;
+    private String customerEmail;
     private String orderId;
 
 

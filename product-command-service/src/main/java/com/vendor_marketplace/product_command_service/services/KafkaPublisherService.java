@@ -22,9 +22,6 @@ public class KafkaPublisherService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    /**
-     * Generic method to publish Kafka events and log results.
-     */
     private void publishEvent(String topic, String key, Object event, String eventType) {
         try {
             CompletableFuture<SendResult<String, Object>> future =

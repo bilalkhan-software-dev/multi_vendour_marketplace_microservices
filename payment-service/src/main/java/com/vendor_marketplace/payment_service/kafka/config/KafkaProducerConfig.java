@@ -1,4 +1,4 @@
-package com.vendor_marketplace.payment_service.config;
+package com.vendor_marketplace.payment_service.kafka.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -69,9 +69,9 @@ public class KafkaProducerConfig {
 
 
     @Bean
-    public NewTopic productUpdateStockTopic() {
-        log.info("PRODUCT UPDATE STOCK topic created: {}", PRODUCT_UPDATE_STOCK_TOPIC);
-        return new NewTopic(PRODUCT_UPDATE_STOCK_TOPIC, 3, (short) 1);
+    public NewTopic paymentSuccessProductUpdateStockTopic() {
+        log.info("Payment success PRODUCT UPDATE STOCK topic created: {}", PAYMENT_SUCCESS_PRODUCT_UPDATE_STOCK_TOPIC);
+        return new NewTopic(PAYMENT_SUCCESS_PRODUCT_UPDATE_STOCK_TOPIC, 3, (short) 1);
     }
 
 

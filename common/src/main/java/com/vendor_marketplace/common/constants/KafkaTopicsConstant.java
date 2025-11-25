@@ -16,6 +16,9 @@ public class KafkaTopicsConstant {
     public static final String PRODUCT_DELETE_TOPIC = "product-delete-topic";
 
     public static final String PRODUCT_UPDATE_STOCK_TOPIC = "product-update-stock-topic";
+    public static final String ORDER_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC = "order-cancel-product-update-stock-topic";
+    public static final String PAYMENT_SUCCESS_PRODUCT_UPDATE_STOCK_TOPIC = "payment-success-product-update-stock-topic";
+
 
     public static final String TRANSACTION_CREATED_TOPIC = "transaction-created-topic";
     public static final String SELLER_REPORT_TOPIC = "seller-report-topic";
@@ -34,7 +37,6 @@ public class KafkaTopicsConstant {
      * Either payment failed or payment cancel then publish this topic
      */
     public static final String PAYMENT_FAILED_TOPIC = "order-failed-topic";
-
 
 
 }

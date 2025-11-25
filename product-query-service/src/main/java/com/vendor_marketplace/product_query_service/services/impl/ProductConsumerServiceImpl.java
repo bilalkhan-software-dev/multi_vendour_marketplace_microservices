@@ -25,7 +25,6 @@ public class ProductConsumerServiceImpl implements ProductConsumerService {
 
     private final ProductDao productDao;
 
-
     @Override
     @Transactional
     public void addProduct(ProductCreateEvent event) {

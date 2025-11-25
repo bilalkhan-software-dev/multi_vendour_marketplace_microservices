@@ -3,12 +3,16 @@ package com.vendor_marketplace.order_service.services.Impl;
 import com.vendor_marketplace.common.dto.enums.OrderStatus;
 import com.vendor_marketplace.common.dto.enums.PaymentStatus;
 import com.vendor_marketplace.common.dto.event.OrderCreatedEvent;
+import com.vendor_marketplace.common.dto.event.OrderNotificationEvent;
+import com.vendor_marketplace.common.dto.event.ProductUpdateStockEvent;
+import com.vendor_marketplace.common.dto.event.SellerReportCreateEvent;
 import com.vendor_marketplace.common.dto.response.CartResponse;
 import com.vendor_marketplace.common.dto.response.PagedResponse;
 import com.vendor_marketplace.common.exception.ResourceNotFoundException;
+import com.vendor_marketplace.common.exception.UnauthorizedException;
 import com.vendor_marketplace.common.utils.ProductUtil;
 import com.vendor_marketplace.order_service.dao.interfaces.OrderDao;
-import com.vendor_marketplace.order_service.dao.interfaces.OrderItemDao;
+import com.vendor_marketplace.order_service.exception.BusinessException;
 import com.vendor_marketplace.order_service.mapper.OrderMapper;
 import com.vendor_marketplace.order_service.models.dto.request.CheckoutRequest;
 import com.vendor_marketplace.order_service.models.dto.response.OrderResponse;
@@ -18,11 +22,14 @@ import com.vendor_marketplace.order_service.services.KafkaPublisherService;
 import com.vendor_marketplace.order_service.services.OrderService;
 import com.vendor_marketplace.order_service.utils.OrderUtils;
 import jakarta.transaction.Transactional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +43,11 @@ class OrderServiceImpl implements OrderService {
 
     private final OrderDao orderDao;
     private final KafkaPublisherService kafkaPublisherService;
-    private final OrderItemDao orderItemDao;
     private final OrderUtils utils;
 
     @Override
     @Transactional
-    public void placeOrder(String userId, CheckoutRequest request) {
+    public String placeOrder(String userId, String email, CheckoutRequest request) {
         log.info("Starting order placement process | userId={}", userId);
 
         log.debug("Fetching user cart | userId={}", userId);
@@ -58,7 +64,7 @@ class OrderServiceImpl implements OrderService {
                 userId, itemsBySeller.size());
 
         String orderId = utils.generateOrderId();
-        log.info("Generated master order ID | orderId={} | userId={}", orderId, userId);
+        log.info("Generated master order ID | orderID={} | userId={}", orderId, userId);
 
         List<String> sellerIds = new ArrayList<>();
 
@@ -94,7 +100,7 @@ class OrderServiceImpl implements OrderService {
                     .build();
 
             // Add order items
-            log.debug("Adding items to order | orderId={} | sellerId={}", orderId, sellerId);
+            log.debug("Adding items to order | orderID={} | sellerId={}", orderId, sellerId);
             for (CartResponse.CartItemResponse item : sellerItems) {
                 createdOrder.addOrderItem(OrderItem.builder()
                         .sellingPrice(item.getSellingPrice())
@@ -106,23 +112,25 @@ class OrderServiceImpl implements OrderService {
                         item.getProductId(), item.getQuantity());
             }
 
-            log.info("Saving order to database | orderId={} | sellerId={}", orderId, sellerId);
+            log.info("Saving order to database | orderID={} | sellerId={}", orderId, sellerId);
             orderDao.save(createdOrder);
-            log.info("Order saved successfully | orderId={} | sellerId={}", orderId, sellerId);
+            log.info("Order saved successfully | orderID={} | sellerId={}", orderId, sellerId);
         }
 
-        log.info("Publishing Kafka order created event | orderId={} | paymentMethod={}",
+        log.info("Publishing Kafka order created event | orderID={} | paymentMethod={}",
                 orderId, request.getPaymentMethod());
         OrderCreatedEvent event = OrderCreatedEvent.builder()
                 .paymentMethod(request.getPaymentMethod())
                 .orderId(orderId)
                 .customerId(userId)
+                .customerEmail(email)
                 .totalAmount(cart.getCartItems().stream().mapToInt(CartResponse.CartItemResponse::getMrpPrice).sum())
                 .sellerIds(sellerIds)
                 .build();
         kafkaPublisherService.publishOrderCreatedEvent(event);
-        log.info("Order placement completed successfully | userId={} | masterOrderId={} | sellerCount={}",
+        log.info("Order placement completed successfully | userId={} | masterOrderID={} | sellerCount={}",
                 userId, orderId, itemsBySeller.size());
+        return orderId;
     }
 
 
@@ -143,27 +151,233 @@ class OrderServiceImpl implements OrderService {
 
     @Override
     public PagedResponse<OrderResponse> getSellerOrders(String sellerId, int page, int size, boolean isNewest) {
-        Page<Order> orders = orderDao.findBySeller(sellerId, page, size, isNewest);
+        Page<@NonNull Order> orders = orderDao.findBySeller(sellerId, page, size, isNewest);
         return OrderService.buildPagedResponse(orders, OrderMapper::toOrderResponse);
     }
 
     @Override
     public PagedResponse<OrderResponse> getUserOrders(String userId, int page, int size, boolean isNewest) {
-        Page<Order> orders = orderDao.findByUser(userId, page, size, isNewest);
+        Page<@NonNull Order> orders = orderDao.findByUser(userId, page, size, isNewest);
         return OrderService.buildPagedResponse(orders, OrderMapper::toOrderResponse);
     }
 
     @Override
+    @Transactional
     public void deleteOrderById(Long id) {
+        log.info("Deleting order with id | order Id={}", id);
         orderDao.deleteById(id);
+        log.info("Order deleted successfully | order Id={}", id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrders(String orderId) {
+        log.info("Deleting orders | orderID={}", orderId);
+        orderDao.deleteOrderIdOrders(orderId);
+        log.info("Orders deleted successfully | orderID={}", orderId);
+    }
+
+    @Override
+    public PagedResponse<OrderResponse> getAllOrders(int page, int size, boolean isNewest) {
+
+        Page<@NonNull Order> orders = orderDao.findAll(page, size, isNewest);
+
+        return OrderService.buildPagedResponse(orders, OrderMapper::toOrderResponse);
+
     }
 
 
-    public void updateOrderStatus(String orderId) {
+    @Override
+    @Transactional
+    public OrderResponse updateOrderStatus(String sellerId, Long id, OrderStatus newStatus) {
 
+        log.info("Starting order status update | sellerId={} | order Id={} | newStatus={}",
+                sellerId, id, newStatus);
+
+        log.debug("Fetching order from database | order Id={}", id);
+        Order existingOrder = orderDao.findById(id).orElseThrow(
+                () -> {
+                    log.error("Order not found | order Id={}", id);
+                    return new ResourceNotFoundException("Order not found with id: " + id);
+                }
+        );
+        log.debug("Order found | orderId={} | currentStatus={} | orderSellerId={}",
+                id, existingOrder.getOrderStatus(), existingOrder.getSellerId());
+
+        // checking only seller can update his own orders
+        if (!existingOrder.getSellerId().equals(sellerId)) {
+            log.warn("Unauthorized status update attempt | sellerId={} | orderSellerId={} | order id={}",
+                    sellerId, existingOrder.getSellerId(), id);
+            throw new UnauthorizedException("Seller " + sellerId + " is not authorized to update order " + id);
+        }
+
+        // no need to changes if same status request
+        if (existingOrder.getOrderStatus().equals(newStatus)) {
+            log.info("Order status unchanged | order Id={} | status={}", id, newStatus);
+            return OrderMapper.toOrderResponse(existingOrder);
+        }
+
+        if (OrderService.isNotUpdateAbleStatus(existingOrder)) {
+            log.info("Order status is not in updatable condition status: {}", existingOrder.getOrderStatus());
+            throw new BusinessException("Order status is not updatable");
+        }
+
+        OrderStatus oldStatus = existingOrder.getOrderStatus();
+        existingOrder.setOrderStatus(newStatus);
+
+        log.info("Updating order status | order Id={} | oldStatus={} | newStatus={}",
+                id, oldStatus, newStatus);
+
+        log.debug("Saving updated order | orderId={}", id);
+        Order savedOrder = orderDao.save(existingOrder);
+        log.info("Order status updated successfully | order Id={} | oldStatus={} | newStatus={}",
+                id, oldStatus, newStatus);
+
+        return OrderMapper.toOrderResponse(savedOrder);
 
     }
 
+    // for kafka
+    @Override
+    @Transactional
+    public void updateOrderAndPaymentStatus(String orderId, OrderStatus orderStatus, PaymentStatus paymentStatus, String email) {
+        log.info("Bulk updating order status | orderID={} | orderStatus={} | paymentStatus={}",
+                orderId, orderStatus, paymentStatus);
+
+        int updatedCount = orderDao.updateOrderAndPaymentStatus(orderId, orderStatus, paymentStatus);
+
+        if (updatedCount == 0) {
+            log.warn("No orders updated | orderID={}", orderId);
+            throw new ResourceNotFoundException("Order not found with id: " + orderId);
+        }
+        log.info("Bulk update completed | orderID={} | updatedCount={} | orderStatus={} | paymentStatus={}",
+                orderId, updatedCount, orderStatus, paymentStatus);
+
+        sendOrderNotification(orderId, email, orderStatus);
+    }
+
+
+    @Transactional
+    @Override
+    public List<OrderResponse> cancelOrder(String orderId, String userId, String email) {
+        log.info("Attempting to cancel order | orderID={} | userId={}", orderId, userId);
+
+        // Check if order exists
+        if (!orderDao.existByOrderId(orderId)) {
+            log.error("Order not found | orderID={}", orderId);
+            throw new ResourceNotFoundException("Order not found: " + orderId);
+        }
+
+        // Check if order is older than 1 day
+        LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
+        boolean isOrderOlderThanOneDay = orderDao.existByOrderIdAndCreatedAtBefore(orderId, oneDayAgo);
+
+        if (isOrderOlderThanOneDay) {
+            log.warn("Order cancellation rejected - too old | orderID={} | cutoffTime={}", orderId, oneDayAgo);
+            throw new BusinessException("Order cannot be cancelled after 24 hours");
+        }
+
+        // Check if order belongs to user
+        List<Order> userOrders = orderDao.findByOrderIdAndUserId(orderId, userId);
+
+        if (userOrders.isEmpty()) {
+            log.warn("Unauthorized cancellation attempt | orderID={} | userId={}", orderId, userId);
+            throw new ResourceNotFoundException("No order available for this ORDER ID: " + orderId);
+        }
+
+        boolean allOrdersBelongToUser = userOrders.stream()
+                .allMatch(order -> userId.equals(order.getUserId()));
+
+        if (!allOrdersBelongToUser) {
+            log.warn("Unauthorized cancellation attempt | orderID={} | userId={}", orderId, userId);
+            throw new UnauthorizedException("You are not authorized to cancel this order");
+        }
+
+        List<Order> orders = cancelOrders(userOrders);
+        log.info("Order cancelled successfully | orderID={} | userId={}", orderId, userId);
+
+        // Publish events
+        publishEvents(orders, orderId, email);
+
+        return orders.stream().map(OrderMapper::toOrderResponse).toList();
+    }
+
+    private List<Order> cancelOrders(List<Order> orders) {
+        String orderId = orders.get(0).getOrderId();
+
+        // Check if ANY order is in non-cancellable status
+        boolean hasNonCancellableOrders = orders.stream()
+                .anyMatch(OrderService::isNonCancellableStatus);
+
+        if (hasNonCancellableOrders) {
+            List<Order> nonCancellableOrders = orders.stream()
+                    .filter(OrderService::isNonCancellableStatus)
+                    .toList();
+
+            log.error("Cannot cancel order | orderID={} | reason=non_cancellable_orders_found | count={}",
+                    orderId, nonCancellableOrders.size());
+
+            nonCancellableOrders.forEach(order ->
+                    log.debug("Non-cancellable order | sellerId={} | status={}",
+                            order.getSellerId(), order.getOrderStatus()));
+
+            throw new BusinessException("Cannot cancel order because some items have already been shipped/delivered");
+        }
+
+        // Cancel all orders
+        orders.forEach(order -> {
+            order.setOrderStatus(OrderStatus.CANCELLED);
+            order.setPaymentStatus(PaymentStatus.REFUND_REQUEST);
+            log.debug("Cancelling order | sellerId={}", order.getSellerId());
+        });
+
+        List<Order> savedAll = orderDao.saveAll(orders);
+        log.info("All orders cancelled successfully | orderID={} | cancelledCount={}",
+                orderId, orders.size());
+
+        return savedAll;
+    }
+
+    @Async
+    protected void publishEvents(List<Order> orders, String orderId, String email) {
+        prepareAndPublishSellerReportEvents(orders);
+        prepareAndPublishProductUpdateStockEvents(orders);
+        sendOrderNotification(orderId, email, OrderStatus.CANCELLED);
+    }
+
+    private void prepareAndPublishSellerReportEvents(List<Order> orders) {
+        orders.forEach(order -> {
+            SellerReportCreateEvent event = SellerReportCreateEvent.builder()
+                    .cancelOrders(1)
+                    .sellerId(order.getSellerId())
+                    .totalRefunds((long) order.getTotalSellingPrice())
+                    .build();
+
+            kafkaPublisherService.publishSellerReportEvent(event);
+        });
+    }
+
+    private void prepareAndPublishProductUpdateStockEvents(List<Order> orders) {
+        orders.forEach(order -> order.getOrderItems().forEach(orderItem -> {
+                ProductUpdateStockEvent event = ProductUpdateStockEvent.builder()
+                        .productId(orderItem.getProductId())
+                        .quantity(orderItem.getQuantity())
+                        .build();
+                kafkaPublisherService.publishProductUpdateStockEvent(event);
+            }));
+    }
+
+    private void sendOrderNotification(String orderId, String email, OrderStatus orderStatus) {
+
+        OrderNotificationEvent event = OrderNotificationEvent.builder()
+                .to(email)
+                .orderId(orderId)
+                .orderStatus(orderStatus)
+                .build();
+
+        kafkaPublisherService.publishOrderNotificationEvent(event);
+
+    }
 
 }
 

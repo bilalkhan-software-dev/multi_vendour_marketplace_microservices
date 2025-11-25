@@ -1,6 +1,8 @@
 package com.vendor_marketplace.order_service.services.Impl;
 
 import com.vendor_marketplace.common.dto.event.OrderCreatedEvent;
+import com.vendor_marketplace.common.dto.event.OrderNotificationEvent;
+import com.vendor_marketplace.common.dto.event.ProductUpdateStockEvent;
 import com.vendor_marketplace.common.dto.event.SellerReportCreateEvent;
 import com.vendor_marketplace.order_service.services.KafkaPublisherService;
 import lombok.RequiredArgsConstructor;
@@ -54,8 +56,31 @@ class KafkaPublisherServiceImpl implements KafkaPublisherService {
 
 
     @Override
-    public void publishOrderConfirmNotificationEvent() {
+    public void publishOrderNotificationEvent(OrderNotificationEvent event) {
 
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(ORDER_NOTIFICATION_TOPIC, event.getOrderId(), event);
 
+        future.whenComplete((result, ex) -> {
+            if (ex != null) {
+                log.error("Failed to publish seller report event", ex);
+            } else {
+                log.info("Order notification event published successfully | topic={} | partition={} | offset={}",
+                        ORDER_NOTIFICATION_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+            }
+        });
+    }
+
+    @Override
+    public void publishProductUpdateStockEvent(ProductUpdateStockEvent event) {
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(ORDER_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC, event.getProductId(), event);
+
+        future.whenComplete((result, ex) -> {
+            if (ex != null) {
+                log.error("Failed to publish order cancel product update stock event", ex);
+            } else {
+                log.info("Order cancel product update stock event published successfully | topic={} | partition={} | offset={}",
+                        ORDER_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+            }
+        });
     }
 }

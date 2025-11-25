@@ -5,8 +5,6 @@ import com.vendor_marketplace.common.dto.response.CartResponse;
 import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.order_service.feignClient.CartServiceClient;
 import com.vendor_marketplace.order_service.feignClient.UserServiceClient;
-import com.vendor_marketplace.order_service.models.dto.response.UserAddressResponse;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,19 +19,8 @@ import java.util.Map;
 @Slf4j
 public class OrderUtils {
 
-    private final UserServiceClient userService;
     private final CartServiceClient cartService;
     private final ObjectMapper objectMapper;
-
-
-    public UserAddressResponse fetchUserShippedAddress(String userId, Long id) {
-        ResponseEntity<UserAddressResponse> response = userService.getAddressById(id);
-        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            log.error("Error while getting shipping address: {} for user(customer): {}", id, userId);
-            throw new ResourceNotFoundException("Address not found");
-        }
-        return response.getBody();
-    }
 
     public CartResponse fetchUserCart(String userId) {
 

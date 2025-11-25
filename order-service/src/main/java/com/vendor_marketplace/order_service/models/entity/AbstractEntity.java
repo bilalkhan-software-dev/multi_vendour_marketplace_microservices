@@ -2,8 +2,8 @@ package com.vendor_marketplace.order_service.models.entity;
 
 import jakarta.persistence.MappedSuperclass;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @Setter
 public abstract class AbstractEntity {
 
-    @CreatedDate
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
 }

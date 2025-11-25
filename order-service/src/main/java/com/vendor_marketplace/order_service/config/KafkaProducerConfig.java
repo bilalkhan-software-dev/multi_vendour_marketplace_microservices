@@ -60,5 +60,11 @@ public class KafkaProducerConfig {
         return new NewTopic(ORDER_NOTIFICATION_TOPIC, 3, (short) 1);
     }
 
+    @Bean
+    public NewTopic orderCancelProductStockTopic() {
+        log.info("Order cancel product update stock topic created: {}", ORDER_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC);
+        return new NewTopic(ORDER_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC, 3, (short) 1);
+    }
+
 
 }

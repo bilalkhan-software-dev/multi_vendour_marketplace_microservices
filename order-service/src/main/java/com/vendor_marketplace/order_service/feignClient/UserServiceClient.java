@@ -1,6 +1,5 @@
 package com.vendor_marketplace.order_service.feignClient;
 
-import com.vendor_marketplace.order_service.models.dto.response.UserAddressResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
