@@ -1,5 +1,6 @@
 package com.vendor_marketplace.order_service.dao.implementation;
 
+import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.order_service.dao.interfaces.OrderDao;
 import com.vendor_marketplace.order_service.dao.repository.OrderRepository;
 import com.vendor_marketplace.order_service.models.entity.Order;
@@ -38,16 +39,33 @@ class OrderDaoImpl implements OrderDao {
     }
 
 
-    public List<Order> findByOrderId(String orderId){
-
+    @Override
+    public List<Order> findByOrderId(String orderId) {
+        return orderRepository.findByOrderId(orderId);
     }
 
+    @Override
+    public Page<Order> findBySeller(String sellerId, int page, int size, boolean isNewest) {
+        Sort sort = Sort.by(isNewest ? Sort.Direction.DESC : Sort.Direction.ASC, "createdAt");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return orderRepository.findBySellerId(sellerId, pageable);
+    }
 
+    @Override
+    public Page<Order> findByUser(String userId, int page, int size, boolean isNewest) {
+        Sort sort = Sort.by(isNewest ? Sort.Direction.DESC : Sort.Direction.ASC, "createdAt");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return orderRepository.findByUserId(userId, pageable);
+    }
 
+    @Override
+    public void deleteById(Long id) {
+        orderRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Order not found")
+        );
 
-
-
-
+        orderRepository.deleteById(id);
+    }
 
 
 }

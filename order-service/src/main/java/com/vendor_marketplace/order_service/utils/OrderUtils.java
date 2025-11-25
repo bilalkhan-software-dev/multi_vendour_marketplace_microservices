@@ -6,6 +6,7 @@ import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.order_service.feignClient.CartServiceClient;
 import com.vendor_marketplace.order_service.feignClient.UserServiceClient;
 import com.vendor_marketplace.order_service.models.dto.response.UserAddressResponse;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class OrderUtils{
+public class OrderUtils {
 
     private final UserServiceClient userService;
     private final CartServiceClient cartService;

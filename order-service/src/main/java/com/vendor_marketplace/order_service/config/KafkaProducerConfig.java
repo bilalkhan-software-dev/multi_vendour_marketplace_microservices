@@ -15,8 +15,7 @@ import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.vendor_marketplace.common.constants.KafkaTopicsConstant.ORDER_CREATED_TOPIC;
-import static com.vendor_marketplace.common.constants.KafkaTopicsConstant.SELLER_REPORT_TOPIC;
+import static com.vendor_marketplace.common.constants.KafkaTopicsConstant.*;
 
 
 @Configuration
@@ -52,6 +51,13 @@ public class KafkaProducerConfig {
     public NewTopic sellerReportTopic() {
         log.info("Seller Report topic created: {}", SELLER_REPORT_TOPIC);
         return new NewTopic(SELLER_REPORT_TOPIC, 3, (short) 1);
+    }
+
+
+    @Bean
+    public NewTopic orderNotificationTopic() {
+        log.info("Order notification topic created: {}", ORDER_NOTIFICATION_TOPIC);
+        return new NewTopic(ORDER_NOTIFICATION_TOPIC, 3, (short) 1);
     }
 
 

@@ -26,6 +26,7 @@ public class KafkaTopicsConstant {
      */
 
     public static final String ORDER_CREATED_TOPIC = "order-created-topic";
+    public static final String ORDER_NOTIFICATION_TOPIC = "order-notification-topic";
 
     public static final String PAYMENT_SUCCESS_TOPIC = "payment-success-topic";
 
@@ -33,6 +34,7 @@ public class KafkaTopicsConstant {
      * Either payment failed or payment cancel then publish this topic
      */
     public static final String PAYMENT_FAILED_TOPIC = "order-failed-topic";
+
 
 
 }

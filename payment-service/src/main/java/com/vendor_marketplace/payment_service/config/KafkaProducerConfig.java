@@ -67,11 +67,13 @@ public class KafkaProducerConfig {
         return new NewTopic(SELLER_REPORT_TOPIC, 3, (short) 1);
     }
 
+
     @Bean
     public NewTopic productUpdateStockTopic() {
         log.info("PRODUCT UPDATE STOCK topic created: {}", PRODUCT_UPDATE_STOCK_TOPIC);
         return new NewTopic(PRODUCT_UPDATE_STOCK_TOPIC, 3, (short) 1);
     }
+
 
 
 

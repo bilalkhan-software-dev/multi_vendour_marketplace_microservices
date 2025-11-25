@@ -2,20 +2,28 @@ package com.vendor_marketplace.order_service.services.Impl;
 
 import com.vendor_marketplace.common.dto.enums.OrderStatus;
 import com.vendor_marketplace.common.dto.enums.PaymentStatus;
+import com.vendor_marketplace.common.dto.event.OrderCreatedEvent;
 import com.vendor_marketplace.common.dto.response.CartResponse;
+import com.vendor_marketplace.common.dto.response.PagedResponse;
+import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.common.utils.ProductUtil;
 import com.vendor_marketplace.order_service.dao.interfaces.OrderDao;
 import com.vendor_marketplace.order_service.dao.interfaces.OrderItemDao;
+import com.vendor_marketplace.order_service.mapper.OrderMapper;
 import com.vendor_marketplace.order_service.models.dto.request.CheckoutRequest;
+import com.vendor_marketplace.order_service.models.dto.response.OrderResponse;
 import com.vendor_marketplace.order_service.models.entity.Order;
 import com.vendor_marketplace.order_service.models.entity.OrderItem;
+import com.vendor_marketplace.order_service.services.KafkaPublisherService;
 import com.vendor_marketplace.order_service.services.OrderService;
 import com.vendor_marketplace.order_service.utils.OrderUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,6 +35,7 @@ import java.util.stream.Collectors;
 class OrderServiceImpl implements OrderService {
 
     private final OrderDao orderDao;
+    private final KafkaPublisherService kafkaPublisherService;
     private final OrderItemDao orderItemDao;
     private final OrderUtils utils;
 
@@ -51,10 +60,13 @@ class OrderServiceImpl implements OrderService {
         String orderId = utils.generateOrderId();
         log.info("Generated master order ID | orderId={} | userId={}", orderId, userId);
 
+        List<String> sellerIds = new ArrayList<>();
+
         // Creating separate orders for each seller
         for (Map.Entry<String, List<CartResponse.CartItemResponse>> entry : itemsBySeller.entrySet()) {
             String sellerId = entry.getKey();
             List<CartResponse.CartItemResponse> sellerItems = entry.getValue();
+            sellerIds.add(sellerId);
 
             log.debug("Processing seller order | sellerId={} | itemCount={}",
                     sellerId, sellerItems.size());
@@ -97,15 +109,59 @@ class OrderServiceImpl implements OrderService {
             log.info("Saving order to database | orderId={} | sellerId={}", orderId, sellerId);
             orderDao.save(createdOrder);
             log.info("Order saved successfully | orderId={} | sellerId={}", orderId, sellerId);
-
-            // Publish Kafka event for payment
-            log.info("Publishing Kafka order created event | orderId={} | paymentMethod={}",
-                    orderId, request.getPaymentMethod());
-            // kafkaTemplate.send(...);
         }
 
+        log.info("Publishing Kafka order created event | orderId={} | paymentMethod={}",
+                orderId, request.getPaymentMethod());
+        OrderCreatedEvent event = OrderCreatedEvent.builder()
+                .paymentMethod(request.getPaymentMethod())
+                .orderId(orderId)
+                .customerId(userId)
+                .totalAmount(cart.getCartItems().stream().mapToInt(CartResponse.CartItemResponse::getMrpPrice).sum())
+                .sellerIds(sellerIds)
+                .build();
+        kafkaPublisherService.publishOrderCreatedEvent(event);
         log.info("Order placement completed successfully | userId={} | masterOrderId={} | sellerCount={}",
                 userId, orderId, itemsBySeller.size());
+    }
+
+
+    @Override
+    public List<OrderResponse> getOrdersOfTheOrderId(String orderId) {
+        return orderDao.findByOrderId(orderId).stream()
+                .map(OrderMapper::toOrderResponse)
+                .toList();
+    }
+
+    @Override
+    public OrderResponse getOrderById(Long id) {
+
+        return OrderMapper.toOrderResponse(orderDao.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Order not found")
+        ));
+    }
+
+    @Override
+    public PagedResponse<OrderResponse> getSellerOrders(String sellerId, int page, int size, boolean isNewest) {
+        Page<Order> orders = orderDao.findBySeller(sellerId, page, size, isNewest);
+        return OrderService.buildPagedResponse(orders, OrderMapper::toOrderResponse);
+    }
+
+    @Override
+    public PagedResponse<OrderResponse> getUserOrders(String userId, int page, int size, boolean isNewest) {
+        Page<Order> orders = orderDao.findByUser(userId, page, size, isNewest);
+        return OrderService.buildPagedResponse(orders, OrderMapper::toOrderResponse);
+    }
+
+    @Override
+    public void deleteOrderById(Long id) {
+        orderDao.deleteById(id);
+    }
+
+
+    public void updateOrderStatus(String orderId) {
+
+
     }
 
 
