@@ -56,14 +56,14 @@ public class KafkaProducerConfig {
 
     @Bean
     public NewTopic orderNotificationTopic() {
-        log.info("Order notification topic created: {}", ORDER_NOTIFICATION_TOPIC);
-        return new NewTopic(ORDER_NOTIFICATION_TOPIC, 3, (short) 1);
+        log.info("Send notification topic created: {}", SEND_NOTIFICATION_TOPIC);
+        return new NewTopic(SEND_NOTIFICATION_TOPIC, 3, (short) 1);
     }
 
     @Bean
-    public NewTopic orderCancelProductStockTopic() {
-        log.info("Order cancel product update stock topic created: {}", ORDER_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC);
-        return new NewTopic(ORDER_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC, 3, (short) 1);
+    public NewTopic orderConfirmCancelProductStockTopic() {
+        log.info("Order confirmed/cancel product update stock topic created: {}", ORDER_CONFIRMED_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC);
+        return new NewTopic(ORDER_CONFIRMED_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC, 3, (short) 1);
     }
 
 

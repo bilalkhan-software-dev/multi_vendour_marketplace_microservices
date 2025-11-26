@@ -61,21 +61,5 @@ public class KafkaProducerConfig {
         return new NewTopic(TRANSACTION_CREATED_TOPIC, 3, (short) 1);
     }
 
-    @Bean
-    public NewTopic sellerReportTopic() {
-        log.info("Seller Report topic created: {}", SELLER_REPORT_TOPIC);
-        return new NewTopic(SELLER_REPORT_TOPIC, 3, (short) 1);
-    }
-
-
-    @Bean
-    public NewTopic paymentSuccessProductUpdateStockTopic() {
-        log.info("Payment success PRODUCT UPDATE STOCK topic created: {}", PAYMENT_SUCCESS_PRODUCT_UPDATE_STOCK_TOPIC);
-        return new NewTopic(PAYMENT_SUCCESS_PRODUCT_UPDATE_STOCK_TOPIC, 3, (short) 1);
-    }
-
-
-
-
 
 }

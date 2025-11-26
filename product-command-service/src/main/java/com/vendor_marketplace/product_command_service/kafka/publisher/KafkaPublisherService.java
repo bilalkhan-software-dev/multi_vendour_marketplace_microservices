@@ -1,4 +1,4 @@
-package com.vendor_marketplace.product_command_service.services;
+package com.vendor_marketplace.product_command_service.kafka.publisher;
 
 import com.vendor_marketplace.common.dto.event.ProductCreateEvent;
 import com.vendor_marketplace.common.dto.event.ProductDeleteEvent;
@@ -21,6 +21,23 @@ import static com.vendor_marketplace.common.constants.KafkaTopicsConstant.*;
 public class KafkaPublisherService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
+
+
+    public void kafkaProductCreateEventPublisher(ProductCreateEvent event) {
+        publishEvent(PRODUCT_CREATE_TOPIC, event.getProductId(), event, "ProductCreateEvent");
+    }
+
+    public void kafkaProductUpdateEventPublisher(ProductUpdateEvent event) {
+        publishEvent(PRODUCT_UPDATE_TOPIC, event.getProductId(), event, "ProductUpdateEvent");
+    }
+
+    public void kafkaProductDeleteEventPublisher(ProductDeleteEvent event) {
+        publishEvent(PRODUCT_DELETE_TOPIC, event.getProductId(), event, "ProductDeleteEvent");
+    }
+
+    public void kafkaProductUpdateStockEventPublisher(ProductUpdateStockEvent event) {
+        publishEvent(PRODUCT_UPDATE_STOCK_TOPIC, event.getProductId(), event, "ProductUpdateStockEvent");
+    }
 
     private void publishEvent(String topic, String key, Object event, String eventType) {
         try {
@@ -46,22 +63,5 @@ public class KafkaPublisherService {
                     eventType, key, topic, e
             );
         }
-    }
-
-
-    public void kafkaProductCreateEventPublisher(ProductCreateEvent event) {
-        publishEvent(PRODUCT_CREATE_TOPIC, event.getProductId(), event, "ProductCreateEvent");
-    }
-
-    public void kafkaProductUpdateEventPublisher(ProductUpdateEvent event) {
-        publishEvent(PRODUCT_UPDATE_TOPIC, event.getProductId(), event, "ProductUpdateEvent");
-    }
-
-    public void kafkaProductDeleteEventPublisher(ProductDeleteEvent event) {
-        publishEvent(PRODUCT_DELETE_TOPIC, event.getProductId(), event, "ProductDeleteEvent");
-    }
-
-    public void kafkaProductUpdateStockEventPublisher(ProductUpdateStockEvent event) {
-        publishEvent(PRODUCT_UPDATE_STOCK_TOPIC, event.getProductId(), event, "ProductUpdateStockEvent");
     }
 }

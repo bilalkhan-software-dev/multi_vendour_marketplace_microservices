@@ -1,10 +1,11 @@
 package com.vendor_marketplace.order_service.kafka.consumer;
 
-import com.vendor_marketplace.common.dto.event.OrderCreatedEvent;
 import com.vendor_marketplace.common.dto.event.PaymentCancelOrFailEvent;
 import com.vendor_marketplace.common.dto.event.PaymentSuccessEvent;
 import com.vendor_marketplace.common.exception.ResourceNotFoundException;
+import com.vendor_marketplace.order_service.kafka.publisher.KafkaPublisherService;
 import com.vendor_marketplace.order_service.services.OrderService;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.BackOff;
@@ -33,7 +34,7 @@ public class KafkaEventConsumer {
             attempts = "2",
             backOff = @BackOff(delay = 4000, multiplier = 2.0, maxDelay = 15000),
             numPartitions = "3",
-            exclude = {ResourceNotFoundException.class}
+            exclude = {ResourceNotFoundException.class, ValidationException.class}
     )
     @KafkaListener(
             topics = PAYMENT_SUCCESS_TOPIC,
@@ -65,7 +66,7 @@ public class KafkaEventConsumer {
             attempts = "2",
             backOff = @BackOff(delay = 4000, multiplier = 2.0, maxDelay = 15000),
             numPartitions = "3",
-            exclude = {ResourceNotFoundException.class}
+            exclude = {ResourceNotFoundException.class, ValidationException.class}
     )
     @KafkaListener(
             topics = PAYMENT_FAILED_TOPIC,

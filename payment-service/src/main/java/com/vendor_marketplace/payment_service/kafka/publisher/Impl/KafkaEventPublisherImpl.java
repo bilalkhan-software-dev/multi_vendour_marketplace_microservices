@@ -36,36 +36,6 @@ class KafkaEventPublisherImpl implements KafkaEventPublisher {
     }
 
     @Override
-    public void publishSellerReportEvent(SellerReportCreateEvent event) {
-
-        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(SELLER_REPORT_TOPIC, event.getSellerId(), event);
-
-        future.whenComplete((result, ex) -> {
-            if (ex != null) {
-                log.error("Failed to publish seller report event", ex);
-            } else {
-                log.info("Seller report event published successfully | topic={} | partition={} | offset={}",
-                        SELLER_REPORT_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
-            }
-        });
-
-    }
-
-    @Override
-    public void publishPaymentSuccessProductUpdateStockEvent(ProductUpdateStockEvent event) {
-        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(PAYMENT_SUCCESS_PRODUCT_UPDATE_STOCK_TOPIC, event.getProductId(), event);
-
-        future.whenComplete((result, ex) -> {
-            if (ex != null) {
-                log.error("Failed to publish payment success product update stock event", ex);
-            } else {
-                log.info("Payment success product update stock event published successfully | topic={} | partition={} | offset={}",
-                        PAYMENT_SUCCESS_PRODUCT_UPDATE_STOCK_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
-            }
-        });
-    }
-
-    @Override
     public void publishPaymentSuccessEvent(PaymentSuccessEvent event) {
         CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(PAYMENT_SUCCESS_TOPIC, event.getOrderId(), event);
 

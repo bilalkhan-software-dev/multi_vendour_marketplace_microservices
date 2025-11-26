@@ -1,6 +1,6 @@
 package com.vendor_marketplace.notification_service.service;
 
-import com.vendor_marketplace.common.dto.event.SendOTPEvent;
+import com.vendor_marketplace.common.dto.event.SendNotificationEvent;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String sender;
 
-    public void sendEmail(SendOTPEvent emailMessage) throws MessagingException, UnsupportedEncodingException {
+    public void sendEmail(SendNotificationEvent emailMessage) throws MessagingException, UnsupportedEncodingException {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
@@ -32,10 +32,10 @@ public class EmailService {
             helper.setFrom(sender, "Vendor Marketplace (Do not reply)");
             helper.setText(emailMessage.getBody(), true);
             javaMailSender.send(mimeMessage);
-            log.info("Email sent to {}", emailMessage.getTo());
+            log.info("Email sent to {} eventType: {}", emailMessage.getTo(), emailMessage.getEventType());
         } catch (MessagingException e) {
-            log.error("Mail send failed: {}", e.getMessage());
-            throw new MailSendException("Failed to send mail for OTP. Please try again later.");
+            log.error("Mail send failed: body: {} : stackTrace{}", emailMessage.getBody(), e.getMessage());
+            throw new MailSendException("Failed to send mail eventType+" + emailMessage.getEventType() + ". Please try again later.");
         }
     }
 }

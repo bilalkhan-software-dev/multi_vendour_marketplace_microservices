@@ -6,10 +6,6 @@ public interface KafkaEventPublisher {
 
     void publishTransactionEvent(TransactionCreateEvent event);
 
-    void publishSellerReportEvent(SellerReportCreateEvent event);
-
-    void publishPaymentSuccessProductUpdateStockEvent(ProductUpdateStockEvent event);
-
     void publishPaymentSuccessEvent(PaymentSuccessEvent event);
 
     void publishPaymentCancelFailEvent(PaymentCancelOrFailEvent event);

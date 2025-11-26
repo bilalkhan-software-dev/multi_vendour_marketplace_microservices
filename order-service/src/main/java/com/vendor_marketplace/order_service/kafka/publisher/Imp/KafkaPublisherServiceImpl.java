@@ -1,10 +1,11 @@
 package com.vendor_marketplace.order_service.kafka.publisher.Imp;
 
 import com.vendor_marketplace.common.dto.event.OrderCreatedEvent;
-import com.vendor_marketplace.common.dto.event.OrderNotificationEvent;
 import com.vendor_marketplace.common.dto.event.ProductUpdateStockEvent;
 import com.vendor_marketplace.common.dto.event.SellerReportCreateEvent;
+import com.vendor_marketplace.common.dto.event.SendNotificationEvent;
 import com.vendor_marketplace.order_service.kafka.publisher.KafkaPublisherService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -20,12 +21,12 @@ import static com.vendor_marketplace.common.constants.KafkaTopicsConstant.*;
 @Slf4j
 class KafkaPublisherServiceImpl implements KafkaPublisherService {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<@NonNull String, @NonNull Object> kafkaTemplate;
 
     @Override
     public void publishOrderCreatedEvent(OrderCreatedEvent event) {
 
-        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(ORDER_CREATED_TOPIC, event.getOrderId(), event);
+        CompletableFuture<SendResult<@NonNull String, @NonNull Object>> future = kafkaTemplate.send(ORDER_CREATED_TOPIC, event.getOrderId(), event);
 
         future.whenComplete((result, ex) -> {
             if (ex != null) {
@@ -38,12 +39,12 @@ class KafkaPublisherServiceImpl implements KafkaPublisherService {
     }
 
     /**
-     * When User Cancel Order
+     * When User Cancel or Confirm (Payment Success) Order
      */
     @Override
     public void publishSellerReportEvent(SellerReportCreateEvent event) {
 
-        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(SELLER_REPORT_TOPIC, event.getSellerId(), event);
+        CompletableFuture<SendResult<@NonNull String, @NonNull Object>> future = kafkaTemplate.send(SELLER_REPORT_TOPIC, event.getSellerId(), event);
 
         future.whenComplete((result, ex) -> {
             if (ex != null) {
@@ -58,31 +59,32 @@ class KafkaPublisherServiceImpl implements KafkaPublisherService {
 
 
     @Override
-    public void publishOrderNotificationEvent(OrderNotificationEvent event) {
+    public void publishSendNotificationEvent(SendNotificationEvent event) {
 
-        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(ORDER_NOTIFICATION_TOPIC, event.getOrderId(), event);
+        CompletableFuture<SendResult<@NonNull String, @NonNull Object>> future = kafkaTemplate.send(SEND_NOTIFICATION_TOPIC, event.getTo(), event);
 
         future.whenComplete((result, ex) -> {
             if (ex != null) {
                 log.error("Failed to publish seller report event", ex);
             } else {
-                log.info("Order notification event published successfully | topic={} | partition={} | offset={}",
-                        ORDER_NOTIFICATION_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+                log.info("Send notification event published successfully | topic={} | partition={} | offset={}",
+                        SEND_NOTIFICATION_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
             }
         });
     }
 
     @Override
-    public void publishProductUpdateStockEvent(ProductUpdateStockEvent event) {
-        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(ORDER_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC, event.getProductId(), event);
+    public void publishUpdateProductStockEvent(ProductUpdateStockEvent event) {
+        CompletableFuture<SendResult<@NonNull String, @NonNull Object>> future = kafkaTemplate.send(ORDER_CONFIRMED_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC, event.getProductId(), event);
 
         future.whenComplete((result, ex) -> {
             if (ex != null) {
-                log.error("Failed to publish order cancel product update stock event", ex);
+                log.error("Failed to publish product update stock event", ex);
             } else {
-                log.info("Order cancel product update stock event published successfully | topic={} | partition={} | offset={}",
-                        ORDER_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+                log.info("Product update stock event published successfully | topic={} | partition={} | offset={}",
+                        ORDER_CONFIRMED_CANCEL_PRODUCT_UPDATE_STOCK_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
             }
         });
     }
+
 }

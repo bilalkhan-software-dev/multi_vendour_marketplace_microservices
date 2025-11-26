@@ -3,9 +3,11 @@ package com.vendor_marketplace.payment_service.controller;
 
 import com.stripe.exception.StripeException;
 import com.vendor_marketplace.common.dto.enums.PaymentStatus;
+import com.vendor_marketplace.payment_service.handler.GenericResponseHandler;
 import com.vendor_marketplace.payment_service.services.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class StripeWebhookController {
 
     private final PaymentService paymentService;
+    private final GenericResponseHandler response;
 
     @PutMapping("/success")
     ResponseEntity<?> processSuccess(
@@ -24,7 +27,7 @@ public class StripeWebhookController {
     ) throws StripeException {
         log.info("Stripe success callback received for payment: {}", paymentService);
         paymentService.verifyPaymentAndPublish(paymentSessionId, order_id, PaymentStatus.SUCCESS);
-        return ResponseEntity.ok("Payment verified successfully");
+        return response.createBuildResponse("Payment verified successfully. Thanks for using our service.", order_id, HttpStatus.OK);
     }
 
     @PutMapping("/success")
@@ -34,7 +37,6 @@ public class StripeWebhookController {
     ) throws StripeException {
         log.info("Stripe cancel callback received for payment: {}", paymentService);
         paymentService.verifyPaymentAndPublish(paymentSessionId, order_id, PaymentStatus.CANCEL);
-        return ResponseEntity.ok("Payment verified successfully");
+        return response.createErrorResponse("Payment cancelled successfully. Your order is not placed", order_id, HttpStatus.OK);
     }
-
 }

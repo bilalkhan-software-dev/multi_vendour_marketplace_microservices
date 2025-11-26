@@ -1,4 +1,4 @@
-package com.vendor_marketplace.product_command_service.config;
+package com.vendor_marketplace.product_command_service.kafka.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;

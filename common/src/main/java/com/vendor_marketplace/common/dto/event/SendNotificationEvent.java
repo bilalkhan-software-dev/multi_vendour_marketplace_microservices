@@ -9,10 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SendOTPEvent {
+public class SendNotificationEvent {
 
     private String to;
     private String subject;
     private String body;
+    private String eventType;
 
 }

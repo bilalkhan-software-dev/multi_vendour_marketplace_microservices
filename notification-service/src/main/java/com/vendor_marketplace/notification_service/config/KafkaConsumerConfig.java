@@ -67,7 +67,6 @@ public class KafkaConsumerConfig {
      */
     @Bean
     public DeadLetterPublishingRecoverer deadLetterPublishingRecoverer(KafkaTemplate<Object, Object> template) {
-        // Default DLT topic name: <original-topic>-dlt
         return new DeadLetterPublishingRecoverer(template);
     }
 
@@ -83,6 +82,7 @@ public class KafkaConsumerConfig {
 
         factory.setConsumerFactory(consumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+        factory.setConcurrency(3);
         return factory;
     }
 }

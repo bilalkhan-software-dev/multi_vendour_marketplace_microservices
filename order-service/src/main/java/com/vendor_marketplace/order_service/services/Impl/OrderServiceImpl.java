@@ -3,13 +3,14 @@ package com.vendor_marketplace.order_service.services.Impl;
 import com.vendor_marketplace.common.dto.enums.OrderStatus;
 import com.vendor_marketplace.common.dto.enums.PaymentStatus;
 import com.vendor_marketplace.common.dto.event.OrderCreatedEvent;
-import com.vendor_marketplace.common.dto.event.OrderNotificationEvent;
 import com.vendor_marketplace.common.dto.event.ProductUpdateStockEvent;
 import com.vendor_marketplace.common.dto.event.SellerReportCreateEvent;
+import com.vendor_marketplace.common.dto.event.SendNotificationEvent;
 import com.vendor_marketplace.common.dto.response.CartResponse;
 import com.vendor_marketplace.common.dto.response.PagedResponse;
 import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.common.exception.UnauthorizedException;
+import com.vendor_marketplace.common.helper.EmailSendingTemplate;
 import com.vendor_marketplace.common.utils.ProductUtil;
 import com.vendor_marketplace.order_service.dao.interfaces.OrderDao;
 import com.vendor_marketplace.order_service.exception.BusinessException;
@@ -22,6 +23,7 @@ import com.vendor_marketplace.order_service.kafka.publisher.KafkaPublisherServic
 import com.vendor_marketplace.order_service.services.OrderService;
 import com.vendor_marketplace.order_service.utils.OrderUtils;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ValidationException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -244,6 +246,19 @@ class OrderServiceImpl implements OrderService {
         log.info("Bulk updating order status | orderID={} | orderStatus={} | paymentStatus={}",
                 orderId, orderStatus, paymentStatus);
 
+        if (orderId == null || orderId.isEmpty()) {
+            throw new ValidationException("Order is null or empty");
+        }
+        if (orderStatus == null) {
+            throw new ValidationException("Order status is null");
+        }
+        if (paymentStatus == null) {
+            throw new ValidationException("Payment status is null");
+        }
+        if (email == null || email.isEmpty()) {
+            throw new ValidationException("Email is null or empty");
+        }
+
         int updatedCount = orderDao.updateOrderAndPaymentStatus(orderId, orderStatus, paymentStatus);
 
         if (updatedCount == 0) {
@@ -252,6 +267,11 @@ class OrderServiceImpl implements OrderService {
         }
         log.info("Bulk update completed | orderID={} | updatedCount={} | orderStatus={} | paymentStatus={}",
                 orderId, updatedCount, orderStatus, paymentStatus);
+        log.info("Publish report and update stock");
+        List<Order> orders = orderDao.findByOrderId(orderId);
+        if (paymentStatus == PaymentStatus.SUCCESS) {
+            publishWhenPaymentSuccess(orders);
+        }
 
         sendOrderNotification(orderId, email, orderStatus);
     }
@@ -297,7 +317,7 @@ class OrderServiceImpl implements OrderService {
         log.info("Order cancelled successfully | orderID={} | userId={}", orderId, userId);
 
         // Publish events
-        publishEvents(orders, orderId, email);
+        publishOrderCancelRelatedEvents(orders, orderId, email);
 
         return orders.stream().map(OrderMapper::toOrderResponse).toList();
     }
@@ -338,11 +358,32 @@ class OrderServiceImpl implements OrderService {
         return savedAll;
     }
 
+
     @Async
-    protected void publishEvents(List<Order> orders, String orderId, String email) {
+    protected void publishOrderCancelRelatedEvents(List<Order> orders, String orderId, String email) {
         prepareAndPublishSellerReportEvents(orders);
         prepareAndPublishProductUpdateStockEvents(orders);
         sendOrderNotification(orderId, email, OrderStatus.CANCELLED);
+    }
+
+    @Async
+    protected void publishWhenPaymentSuccess(List<Order> orders) {
+        prepareAndPublishSellerReportPaymentSuccessEvent(orders);
+        prepareAndPublishProductUpdateStockEvents(orders);
+    }
+
+    private void prepareAndPublishSellerReportPaymentSuccessEvent(List<Order> orders) {
+        orders.forEach(order -> {
+            SellerReportCreateEvent event = SellerReportCreateEvent.builder()
+                    .sellerId(order.getSellerId())
+                    .totalOrders(1)
+                    .totalEarnings((long) order.getTotalSellingPrice())
+                    .totalSales(Long.valueOf(order.getTotalSellingPrice()))
+                    .totalTransactions(1)
+                    .netEarnings(Long.valueOf(order.getTotalSellingPrice()))
+                    .build();
+            kafkaPublisherService.publishSellerReportEvent(event);
+        });
     }
 
     private void prepareAndPublishSellerReportEvents(List<Order> orders) {
@@ -359,23 +400,25 @@ class OrderServiceImpl implements OrderService {
 
     private void prepareAndPublishProductUpdateStockEvents(List<Order> orders) {
         orders.forEach(order -> order.getOrderItems().forEach(orderItem -> {
-                ProductUpdateStockEvent event = ProductUpdateStockEvent.builder()
-                        .productId(orderItem.getProductId())
-                        .quantity(orderItem.getQuantity())
-                        .build();
-                kafkaPublisherService.publishProductUpdateStockEvent(event);
-            }));
+            ProductUpdateStockEvent event = ProductUpdateStockEvent.builder()
+                    .productId(orderItem.getProductId())
+                    .quantity(orderItem.getQuantity())
+                    .build();
+            kafkaPublisherService.publishUpdateProductStockEvent(event);
+        }));
     }
 
     private void sendOrderNotification(String orderId, String email, OrderStatus orderStatus) {
 
-        OrderNotificationEvent event = OrderNotificationEvent.builder()
+        String body = EmailSendingTemplate.sendEmailForOrderStatus(email, orderId, orderStatus.name(), email);
+        SendNotificationEvent event = SendNotificationEvent.builder()
                 .to(email)
-                .orderId(orderId)
-                .orderStatus(orderStatus)
+                .subject("Order Details & Info")
+                .body(body)
+                .eventType("Order status: " + orderStatus)
                 .build();
 
-        kafkaPublisherService.publishOrderNotificationEvent(event);
+        kafkaPublisherService.publishSendNotificationEvent(event);
 
     }
 

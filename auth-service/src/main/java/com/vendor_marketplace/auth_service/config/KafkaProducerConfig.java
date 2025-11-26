@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
@@ -57,8 +56,8 @@ public class KafkaProducerConfig {
 
     @Bean
     public NewTopic sendOTPTopic() {
-        log.info("Send OTP topic created: {}", SEND_OTP_TOPIC);
-        return new NewTopic(SEND_OTP_TOPIC, 3, (short) 1);
+        log.info("Send OTP topic created: {}", SEND_NOTIFICATION_TOPIC);
+        return new NewTopic(SEND_NOTIFICATION_TOPIC, 3, (short) 1);
     }
 
 

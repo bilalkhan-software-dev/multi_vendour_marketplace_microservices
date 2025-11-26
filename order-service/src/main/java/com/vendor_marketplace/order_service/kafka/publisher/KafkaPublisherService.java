@@ -1,9 +1,9 @@
 package com.vendor_marketplace.order_service.kafka.publisher;
 
 import com.vendor_marketplace.common.dto.event.OrderCreatedEvent;
-import com.vendor_marketplace.common.dto.event.OrderNotificationEvent;
 import com.vendor_marketplace.common.dto.event.ProductUpdateStockEvent;
 import com.vendor_marketplace.common.dto.event.SellerReportCreateEvent;
+import com.vendor_marketplace.common.dto.event.SendNotificationEvent;
 
 public interface KafkaPublisherService {
 
@@ -11,9 +11,7 @@ public interface KafkaPublisherService {
 
     void publishSellerReportEvent(SellerReportCreateEvent event); //  when order cancel by customer
 
-    void publishOrderNotificationEvent(OrderNotificationEvent event);
+    void publishSendNotificationEvent(SendNotificationEvent event);
 
-    void publishProductUpdateStockEvent(ProductUpdateStockEvent event);
-
-
+    void publishUpdateProductStockEvent(ProductUpdateStockEvent event);
 }
