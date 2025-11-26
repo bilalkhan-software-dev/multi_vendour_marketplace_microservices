@@ -5,6 +5,7 @@ import com.vendor_marketplace.common.dto.response.PagedResponse;
 import com.vendor_marketplace.user_service.handler.GenericResponseHandler;
 import com.vendor_marketplace.user_service.models.dto.request.AddressRequest;
 import com.vendor_marketplace.user_service.models.dto.request.UpdateUserRequest;
+import com.vendor_marketplace.user_service.models.dto.response.UserAddressResponse;
 import com.vendor_marketplace.user_service.models.dto.response.UserResponse;
 import com.vendor_marketplace.user_service.service.UserService;
 import jakarta.validation.Valid;
@@ -67,13 +68,13 @@ class UserController {
     @GetMapping("/addresses/{id}")
     ResponseEntity<?> getUserAddresses(@PathVariable Long id) {
 
-        Set<UserResponse.UserAddress> userAddresses = userService.getUserAddress(id);
+        Set<UserAddressResponse> userAddresses = userService.getUserAddress(id);
 
         return response.createBuildResponse("User addresses retrieved successfully!", userAddresses, HttpStatus.OK);
     }
 
     @GetMapping("/users")
-    ResponseEntity<?> getUsers(@RequestParam(required = false,defaultValue = "0") Integer pageNo) {
+    ResponseEntity<?> getUsers(@RequestParam(required = false, defaultValue = "0") Integer pageNo) {
 
         PagedResponse<UserResponse> allUsers = userService.getAllUsers(pageNo);
 
@@ -98,6 +99,12 @@ class UserController {
     ResponseEntity<Boolean> isUserExistAuthUserId(@PathVariable String id) {
         boolean userExistWithById = userService.isUserExistWithById(id);
         return ResponseEntity.ok(userExistWithById);
+    }
+
+    @GetMapping("/{id}/address")
+    ResponseEntity<UserAddressResponse> getAddressById(@PathVariable Long id) {
+        UserAddressResponse address = userService.getAddressById(id);
+        return ResponseEntity.ok(address);
     }
 
 

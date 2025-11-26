@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: microservice-vendor_marketplace-order-service-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: order-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: khan
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+
+volumes:
+  postgres_data:
+
+networks:
+  backend:
+    driver: bridge
+  default:
+    external:
+      name: auth-service_kafka-network

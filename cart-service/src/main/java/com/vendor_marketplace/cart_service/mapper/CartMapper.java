@@ -34,6 +34,7 @@ public class CartMapper {
                 .quantity(cartItem.getQuantity())
                 .mrpPrice(cartItem.getMrpPrice())
                 .sellingPrice(cartItem.getSellingPrice())
+              .productSellerId(cartItem.getProductSellerId())
                 .build();
     }
 

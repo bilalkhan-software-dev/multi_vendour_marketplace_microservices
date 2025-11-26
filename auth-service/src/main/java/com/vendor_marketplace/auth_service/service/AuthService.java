@@ -18,7 +18,7 @@ import com.vendor_marketplace.auth_service.utils.JwtUtil;
 import com.vendor_marketplace.auth_service.utils.RandomUtil;
 import com.vendor_marketplace.auth_service.utils.RedisUtil;
 import com.vendor_marketplace.common.dto.event.SellerCreatedEvent;
-import com.vendor_marketplace.common.dto.event.SendOTPEvent;
+import com.vendor_marketplace.common.dto.event.SendNotificationEvent;
 import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -154,10 +154,11 @@ public class AuthService {
 
         String body = EmailSendingTemplate.sendEmailForOTP(authUser.getFullName(), generateOtp);
 
-        SendOTPEvent event = SendOTPEvent.builder()
+        SendNotificationEvent event = SendNotificationEvent.builder()
                 .to(email)
                 .subject("Vendor Marketplace OTP verification")
                 .body(body)
+                .eventType("Send OTP")
                 .build();
 
         kafkaPublisher.publishSendOTPEvent(event);

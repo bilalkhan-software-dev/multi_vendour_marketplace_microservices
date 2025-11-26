@@ -15,8 +15,9 @@ import com.vendor_marketplace.product_command_service.models.dto.request.Product
 import com.vendor_marketplace.product_command_service.models.dto.request.ProductUpdateRequest;
 import com.vendor_marketplace.product_command_service.models.entity.Category;
 import com.vendor_marketplace.product_command_service.models.entity.Product;
-import com.vendor_marketplace.product_command_service.services.KafkaPublisherService;
+import com.vendor_marketplace.product_command_service.kafka.publisher.KafkaPublisherService;
 import com.vendor_marketplace.product_command_service.services.ProductService;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -189,7 +190,7 @@ class ProductServiceImpl implements ProductService {
         log.info("Stock update request | productId={} | quantity={}", productId, quantity);
 
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero");
+            throw new ValidationException("Quantity must be greater than zero");
         }
 
         Product product = productDao.findByProductId(productId)
@@ -200,7 +201,7 @@ class ProductServiceImpl implements ProductService {
         if (currentStock < quantity) {
             log.warn("Stock update failed - insufficient stock | productId={} | currentStock={} | requested={}",
                     productId, currentStock, quantity);
-            throw new IllegalArgumentException("Not enough stock for product: " + productId);
+            throw new ValidationException("Not enough stock for product: " + productId);
         }
 
         int newStock = currentStock - quantity;

@@ -22,6 +22,9 @@ public class CartItem {
     @Column(nullable = false)
     private String productId;
 
+    @Column(nullable = false)
+    private String productSellerId;
+
     private int quantity = 1;
     private Integer mrpPrice;
     private Integer sellingPrice;

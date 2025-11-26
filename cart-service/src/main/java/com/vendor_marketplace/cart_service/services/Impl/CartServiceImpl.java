@@ -57,20 +57,19 @@ public class CartServiceImpl implements CartService {
 
         CartItem cartItem = cartItemDao.findByProductIdAndUserId(productId, userId);
 
-        /*
-         * If cartItem is null means product is not added in the
-         * cart before if it is already added then just need to
-         * update quantity,mrpPrice and sellingPrice
-         */
+        // Check if product already exists in user's cart
         if (cartItem == null) {
+            // NEW ITEM: Create fresh cart item
             cartItem = new CartItem();
             cartItem.setQuantity(quantity);
             cartItem.setCartId(cart.getId());
             cartItem.setUserId(userId);
             cartItem.setProductId(productId);
-            cartItem.setMrpPrice(product.getMrpPrice());
-            cartItem.setSellingPrice(product.getSellingPrice());
+            cartItem.setMrpPrice(quantity * product.getMrpPrice());
+            cartItem.setSellingPrice(quantity * product.getSellingPrice());
+            cartItem.setProductSellerId(product.getSellerId());
         } else {
+            // EXISTING ITEM: Update quantity and prices
             utils.updateExistingCartItem(cartItem, quantity, product);
         }
 

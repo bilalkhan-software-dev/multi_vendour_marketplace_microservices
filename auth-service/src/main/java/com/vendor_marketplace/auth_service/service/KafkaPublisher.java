@@ -1,7 +1,7 @@
 package com.vendor_marketplace.auth_service.service;
 
 import com.vendor_marketplace.common.dto.event.SellerCreatedEvent;
-import com.vendor_marketplace.common.dto.event.SendOTPEvent;
+import com.vendor_marketplace.common.dto.event.SendNotificationEvent;
 import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +54,9 @@ public class KafkaPublisher {
         }
     }
 
-    public void publishSendOTPEvent(SendOTPEvent event) {
+    public void publishSendOTPEvent(SendNotificationEvent event) {
         try {
-            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(SEND_OTP_TOPIC,event.getTo(), event);
+            CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(SEND_NOTIFICATION_TOPIC,event.getTo(), event);
             future.whenComplete((result, ex) -> {
                 if (ex == null) {
                     log.info("Send OTP event published successfully for auth user: {}. Offset: {}",

@@ -33,6 +33,9 @@ public class CartUtils {
         if (quantity > product.getStocks()) {
             throw new UnsufficientStockException("Quantity is out of stock");
         }
+        if (quantity <= 0) {
+            throw new UnsufficientStockException("Quantity must be greater than zero");
+        }
     }
 
     public ProductResponse validateAndGetProductDetails(String productId, String userId) {
@@ -87,7 +90,6 @@ public class CartUtils {
         int totalItems = cart.getCartItems().stream().mapToInt(CartItem::getQuantity).sum();
         int totalMrpPrice = cart.getCartItems().stream().mapToInt(CartItem::getMrpPrice).sum();
         int totalSellingPrice = cart.getCartItems().stream().mapToInt(CartItem::getSellingPrice).sum();
-
 
         cart.setTotalItems(totalItems);
         cart.setTotalMrpPrice(totalMrpPrice);

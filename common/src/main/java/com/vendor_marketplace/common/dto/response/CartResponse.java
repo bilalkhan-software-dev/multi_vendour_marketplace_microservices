@@ -42,6 +42,7 @@ public class CartResponse {
         private String userId;
         private String cartId;
         private String productId;
+        private String productSellerId;
 
     }
 }

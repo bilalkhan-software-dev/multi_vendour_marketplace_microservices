@@ -1,0 +1,67 @@
+package com.vendor_marketplace.payment_service.kafka.publisher.Impl;
+
+import com.vendor_marketplace.common.dto.event.*;
+import com.vendor_marketplace.payment_service.kafka.publisher.KafkaEventPublisher;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.CompletableFuture;
+
+import static com.vendor_marketplace.common.constants.KafkaTopicsConstant.*;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+class KafkaEventPublisherImpl implements KafkaEventPublisher {
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Override
+    public void publishTransactionEvent(TransactionCreateEvent event) {
+
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(TRANSACTION_CREATED_TOPIC, event.getSellerId(), event);
+
+        future.whenComplete((result, ex) -> {
+            if (ex != null) {
+                log.error("Failed to publish transaction create event", ex);
+            } else {
+                log.info("Transaction created event published successfully | topic={} | partition={} | offset={} sellerId: {}",
+                        TRANSACTION_CREATED_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset(), event.getSellerId());
+            }
+        });
+
+    }
+
+    @Override
+    public void publishPaymentSuccessEvent(PaymentSuccessEvent event) {
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(PAYMENT_SUCCESS_TOPIC, event.getOrderId(), event);
+
+        future.whenComplete((result, ex) -> {
+            if (ex != null) {
+                log.error("Failed to publish payment success  event", ex);
+            } else {
+                log.info("Payment success event published successfully | topic={} | partition={} | offset={}",
+                        PAYMENT_SUCCESS_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+            }
+        });
+    }
+
+    @Override
+    public void publishPaymentCancelFailEvent(PaymentCancelOrFailEvent event) {
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(PAYMENT_FAILED_TOPIC, event.getOrderId(), event);
+
+        future.whenComplete((result, ex) -> {
+            if (ex != null) {
+                log.error("Failed to publish payment cancel/fail  event", ex);
+            } else {
+                log.info("Payment cancel/fail event published successfully | topic={} | partition={} | offset={}",
+                        PAYMENT_FAILED_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+            }
+        });
+    }
+
+
+}
