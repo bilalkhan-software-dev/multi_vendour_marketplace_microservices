@@ -20,8 +20,4 @@ public class StripeConfig {
 
     @NotBlank(message = "Cancel URL template is required")
     private String cancelUrl;
-
-    @NotBlank(message = "Currency is required")
-    private String currency;
-
 }

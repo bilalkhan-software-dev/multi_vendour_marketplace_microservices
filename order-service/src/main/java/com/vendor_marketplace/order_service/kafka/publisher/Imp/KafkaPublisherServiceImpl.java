@@ -1,10 +1,10 @@
-package com.vendor_marketplace.order_service.services.Impl;
+package com.vendor_marketplace.order_service.kafka.publisher.Imp;
 
 import com.vendor_marketplace.common.dto.event.OrderCreatedEvent;
 import com.vendor_marketplace.common.dto.event.OrderNotificationEvent;
 import com.vendor_marketplace.common.dto.event.ProductUpdateStockEvent;
 import com.vendor_marketplace.common.dto.event.SellerReportCreateEvent;
-import com.vendor_marketplace.order_service.services.KafkaPublisherService;
+import com.vendor_marketplace.order_service.kafka.publisher.KafkaPublisherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -37,6 +37,9 @@ class KafkaPublisherServiceImpl implements KafkaPublisherService {
         });
     }
 
+    /**
+     * When User Cancel Order
+     */
     @Override
     public void publishSellerReportEvent(SellerReportCreateEvent event) {
 
@@ -50,7 +53,6 @@ class KafkaPublisherServiceImpl implements KafkaPublisherService {
                         SELLER_REPORT_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
             }
         });
-
 
     }
 

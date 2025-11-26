@@ -22,7 +22,6 @@ stripe:
   secret-key: ${STRIPE_SECRET_KEY:} # Add default empty value
   success-url: ${BASE_URL:http://localhost:8080}/api/v2/webhook/stripe/success
   cancel-url: ${BASE_URL:http://localhost:8080}/api/v2/webhook/stripe/cancel
-  currency: ${STRIPE_CURRENCY:usd}
 
 
 eureka:

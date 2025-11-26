@@ -37,10 +37,13 @@ public class Payment {
     private String paymentMethod;
 
     /**
-     * Payment id for stripe/ Jazz cash
+     * Payment session id for stripe/ others
      */
     @Column(unique = true)
-    private String paymentLinkId;
+    private String paymentSessionId;
+
+    @Column(length = 700, nullable = false)
+    private String paymentLinkUrl;
 
     @ElementCollection
     @CollectionTable(

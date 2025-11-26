@@ -20,7 +20,8 @@ public class PaymentResponse {
     private PaymentStatus paymentStatus;
 
     private String paymentMethod;
-    private String paymentLinkId;
+    private String paymentSessionId;
+    private String paymentLinkUrl;
 
     @Builder.Default
     private List<String> sellerIds = new ArrayList<>();

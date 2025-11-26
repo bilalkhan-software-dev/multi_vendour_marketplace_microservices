@@ -1,4 +1,4 @@
-package com.vendor_marketplace.order_service.config;
+package com.vendor_marketplace.order_service.kafka.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;

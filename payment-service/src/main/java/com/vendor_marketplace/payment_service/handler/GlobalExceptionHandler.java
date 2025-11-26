@@ -1,7 +1,10 @@
 package com.vendor_marketplace.payment_service.handler;
 
+import com.stripe.exception.StripeException;
 import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.common.exception.UnauthorizedException;
+import com.vendor_marketplace.payment_service.exception.PaymentException;
+import com.vendor_marketplace.payment_service.exception.PaymentFailedException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +72,20 @@ public class GlobalExceptionHandler {
         log.warn("Resource not found: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<?> handlePaymentException(PaymentException ex) {
+        log.warn("PaymentException : {}", ex.getMessage());
+        return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PaymentFailedException.class)
+    public ResponseEntity<?> handlePaymentException(PaymentFailedException ex) {
+        log.warn("PaymentFailedException : {}", ex.getMessage());
+        return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<?> handleUnauthorizedException(UnauthorizedException ex) {

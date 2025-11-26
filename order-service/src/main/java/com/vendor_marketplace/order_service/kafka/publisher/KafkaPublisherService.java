@@ -1,4 +1,4 @@
-package com.vendor_marketplace.order_service.services;
+package com.vendor_marketplace.order_service.kafka.publisher;
 
 import com.vendor_marketplace.common.dto.event.OrderCreatedEvent;
 import com.vendor_marketplace.common.dto.event.OrderNotificationEvent;

@@ -1,8 +1,6 @@
 package com.vendor_marketplace.payment_service.kafka.publisher.Impl;
 
-import com.vendor_marketplace.common.dto.event.ProductUpdateStockEvent;
-import com.vendor_marketplace.common.dto.event.SellerReportCreateEvent;
-import com.vendor_marketplace.common.dto.event.TransactionCreateEvent;
+import com.vendor_marketplace.common.dto.event.*;
 import com.vendor_marketplace.payment_service.kafka.publisher.KafkaEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,5 +64,34 @@ class KafkaEventPublisherImpl implements KafkaEventPublisher {
             }
         });
     }
+
+    @Override
+    public void publishPaymentSuccessEvent(PaymentSuccessEvent event) {
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(PAYMENT_SUCCESS_TOPIC, event.getOrderId(), event);
+
+        future.whenComplete((result, ex) -> {
+            if (ex != null) {
+                log.error("Failed to publish payment success  event", ex);
+            } else {
+                log.info("Payment success event published successfully | topic={} | partition={} | offset={}",
+                        PAYMENT_SUCCESS_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+            }
+        });
+    }
+
+    @Override
+    public void publishPaymentCancelFailEvent(PaymentCancelOrFailEvent event) {
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(PAYMENT_FAILED_TOPIC, event.getOrderId(), event);
+
+        future.whenComplete((result, ex) -> {
+            if (ex != null) {
+                log.error("Failed to publish payment cancel/fail  event", ex);
+            } else {
+                log.info("Payment cancel/fail event published successfully | topic={} | partition={} | offset={}",
+                        PAYMENT_FAILED_TOPIC, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
+            }
+        });
+    }
+
 
 }

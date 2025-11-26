@@ -36,9 +36,6 @@ public class Order extends AbstractEntity {
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
-//    @ManyToOne
-//    private ShippingAddress shippingAddress;
-
 
     @Column(nullable = false)
     private Long addressId;

@@ -18,7 +18,7 @@ import com.vendor_marketplace.order_service.models.dto.request.CheckoutRequest;
 import com.vendor_marketplace.order_service.models.dto.response.OrderResponse;
 import com.vendor_marketplace.order_service.models.entity.Order;
 import com.vendor_marketplace.order_service.models.entity.OrderItem;
-import com.vendor_marketplace.order_service.services.KafkaPublisherService;
+import com.vendor_marketplace.order_service.kafka.publisher.KafkaPublisherService;
 import com.vendor_marketplace.order_service.services.OrderService;
 import com.vendor_marketplace.order_service.utils.OrderUtils;
 import jakarta.transaction.Transactional;
