@@ -19,7 +19,7 @@ public class ProductQueryServiceImpl implements ProductQueryService {
 
     @Override
     public PagedResponse<ProductResponse> getProducts(
-            String title, String category,final String brand,
+            String title, String category, final String brand,
             String colors, String sizes,
             Integer minPrice, Integer maxPrice, Integer minDiscount,
             String sort, String stock,
@@ -58,5 +58,10 @@ public class ProductQueryServiceImpl implements ProductQueryService {
                 productDao.findByProductId(productId).orElseThrow(
                         () -> new ResourceNotFoundException("Product not found with id: " + productId))
         );
+    }
+
+    @Override
+    public boolean productExistWithId(String product) {
+        return productDao.existByProductId(product);
     }
 }

@@ -33,6 +33,5 @@ public interface ProductQueryService {
     ProductResponse getProductById(String productId);
 
 
-
-
+    boolean productExistWithId(String product);
 }

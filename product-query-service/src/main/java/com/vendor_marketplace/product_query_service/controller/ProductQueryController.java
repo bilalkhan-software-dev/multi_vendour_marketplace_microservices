@@ -30,7 +30,7 @@ public class ProductQueryController {
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) String stock,
             @RequestParam(required = false, defaultValue = "0") Integer pageNumber
-    ){
+    ) {
 
         PagedResponse<ProductResponse> products = productService.getProducts(title, category, brand, colors, sizes, minPrice, maxPrice, minDiscount, sort, stock, pageNumber);
 
@@ -44,7 +44,7 @@ public class ProductQueryController {
     ResponseEntity<?> getSimilarProducts(
             @RequestParam String productId,
             @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
-            @RequestParam(required = false, defaultValue = "true") boolean isNewest){
+            @RequestParam(required = false, defaultValue = "true") boolean isNewest) {
 
         PagedResponse<ProductResponse> productResponsePagedResponse = productService.similarProducts(productId, pageNumber, isNewest);
 
@@ -58,7 +58,7 @@ public class ProductQueryController {
     ResponseEntity<?> getSellerProducts(
             @RequestParam String sellerId,
             @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
-            @RequestParam(required = false, defaultValue = "true") boolean isNewest){
+            @RequestParam(required = false, defaultValue = "true") boolean isNewest) {
 
         PagedResponse<ProductResponse> productResponsePagedResponse = productService.getProductBySellerId(sellerId, pageNumber, isNewest);
 
@@ -69,18 +69,24 @@ public class ProductQueryController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getProductById(@PathVariable String id){
+    ResponseEntity<?> getProductById(@PathVariable String id) {
 
         ProductResponse productById = productService.getProductById(id);
 
         return response.createBuildResponse("Product details retrieved successfully", productById, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}/exist")
+    ResponseEntity<Boolean> getProductExist(@PathVariable String id) {
+
+        return ResponseEntity.ok(productService.productExistWithId(id));
+    }
+
     @GetMapping("/search")
     ResponseEntity<?> searchProduct(
             @RequestParam String queryText,
             @RequestParam(required = false, defaultValue = "0") Integer pageNumber
-    ){
+    ) {
         PagedResponse<ProductResponse> productResponsePagedResponse = productService.searchProducts(queryText, pageNumber);
 
         if (!productResponsePagedResponse.getContent().isEmpty()) {

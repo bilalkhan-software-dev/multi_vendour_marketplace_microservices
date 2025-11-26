@@ -18,4 +18,6 @@ public interface ProductRepository extends MongoRepository<Product,String> {
 
 
     Page<Product> findByCategory_IdAndProductIdNot(String categoryId, String productId,Pageable pageable);
+
+    boolean existsByProductId(String productId);
 }

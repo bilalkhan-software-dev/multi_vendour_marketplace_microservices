@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -227,6 +226,11 @@ class ProductDaoImpl implements ProductDao {
 
         Page<Product> response = productRepository.findBySellerId(sellerId, pageable);
         return buildPagedResponse(response);
+    }
+
+    @Override
+    public boolean existByProductId(String productId){
+        return productRepository.existsByProductId(productId);
     }
 
     private PagedResponse<ProductResponse> executePagedQuery(Query query, Pageable pageable) {
