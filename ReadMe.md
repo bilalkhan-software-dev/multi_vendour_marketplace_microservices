@@ -90,7 +90,7 @@ The system follows a microservices architecture with Database Per Service patter
 - **Database**: PostgreSQL
 - Handles product reviews and ratings
 
-#### **chatbot-service** ##### not confirmed
+#### **chatbot-service — In Progress**
 - **Database**: MongoDB
 - Manages AI chatbot interactions and conversations
 
