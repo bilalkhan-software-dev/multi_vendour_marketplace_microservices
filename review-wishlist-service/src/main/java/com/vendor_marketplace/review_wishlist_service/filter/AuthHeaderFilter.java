@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_
 import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_USER_ROLE_AUTHORIZATION_HEADER;
 
 @Component
+@Slf4j
 public class AuthHeaderFilter extends OncePerRequestFilter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -28,27 +30,27 @@ public class AuthHeaderFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
 
         // public path no need to check header
-        if (requestURI.contains("/api/v2/review/public")) {
+        if (requestURI.startsWith("/api/v2/review/public")) {
+            log.debug("Public endpoint accessed: {}", requestURI);
             filterChain.doFilter(request, response);
             return;
         }
+        log.debug("Private endpoint accessed: {}", requestURI);
 
         String userIdHeader = request.getHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER);
         String roleHeader = request.getHeader(CUSTOM_USER_ROLE_AUTHORIZATION_HEADER);
 
-        // Check if user ID header is present and valid
         if (userIdHeader == null || userIdHeader.trim().isEmpty()) {
             sendErrorResponse(response, "User ID header is required", HttpStatus.UNAUTHORIZED);
             return;
         }
 
-        // Check if role header is present
         if (roleHeader == null || roleHeader.trim().isEmpty()) {
             sendErrorResponse(response, "Role header is required", HttpStatus.UNAUTHORIZED);
             return;
         }
 
-        // Validate role - only Customer and ADMIN are allowed
+        // only Customer and ADMIN are allowed
         try {
             USER_ROLE role = USER_ROLE.valueOf(roleHeader);
             if (role != USER_ROLE.ROLE_CUSTOMER && role != USER_ROLE.ROLE_ADMIN) {

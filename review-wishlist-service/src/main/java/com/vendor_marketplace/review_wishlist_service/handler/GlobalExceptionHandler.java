@@ -3,6 +3,7 @@ package com.vendor_marketplace.review_wishlist_service.handler;
 import com.vendor_marketplace.common.exception.ExistDataException;
 import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.common.exception.UnsufficientStockException;
+import com.vendor_marketplace.review_wishlist_service.exception.NotUpdateAbleException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +83,13 @@ public class GlobalExceptionHandler {
         log.warn("Data conflict: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(NotUpdateAbleException.class)
+    public ResponseEntity<?> handleNotUpdateAbleException(NotUpdateAbleException ex) {
+        log.warn("NotUpdateAbleException: {}", ex.getMessage());
+        return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<?> handleNullPointerException(NullPointerException ex) {
