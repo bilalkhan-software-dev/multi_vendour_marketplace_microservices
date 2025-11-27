@@ -86,11 +86,11 @@ The system follows a microservices architecture with Database Per Service patter
 - **Database**: PostgreSQL
 - Manages discount coupons and promotional codes
 
-#### **review-service**
-- **Database**: MongoDB
+#### **review-wishlist-service**
+- **Database**: PostgreSQL
 - Handles product reviews and ratings
 
-#### **chatbot-service**
+#### **chatbot-service** ##### not confirmed
 - **Database**: MongoDB
 - Manages AI chatbot interactions and conversations
 
@@ -98,9 +98,9 @@ The system follows a microservices architecture with Database Per Service patter
 - **Database**: PostgreSQL
 - Handles seller reporting and transaction analytics
 
-#### **deal_home-service**
+#### **home-service** 
 - **Database**: MongoDB
-- Manages home page deals and featured products
+- Manages home page which category shown in landing page
 
 #### **notification-service**
 - **Functionality**: Email sending
