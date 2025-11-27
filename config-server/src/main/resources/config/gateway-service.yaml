@@ -60,7 +60,14 @@ spring:
                 - Path=/api/v2/user/review/**
                 - Path=/api/v2/user/wishlist/**
                 - Path=/api/v2/admin/rw/**
-                - Path=/api/v2/review/public/**
+                - Path=/api/v2/public/review/**
+
+            - id: home-service
+              uri: lb://HOME-SERVICE
+              predicates:
+                - Path=/api/v2/admin/home/**
+                - Path=/api/v2/public/home/**
+
 
 eureka:
   client:
