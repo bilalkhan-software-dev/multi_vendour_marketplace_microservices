@@ -41,4 +41,6 @@ public interface ProductDao {
     PagedResponse<ProductResponse> findSimilarProducts(String productId, int pageNumber, boolean isNewest);
 
     PagedResponse<ProductResponse> findSellerProducts(String sellerId, int pageNo, boolean isNewest);
+
+    boolean existByProductId(String productId);
 }

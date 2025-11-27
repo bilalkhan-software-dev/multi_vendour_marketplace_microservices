@@ -14,6 +14,7 @@
     <file url="file://$PROJECT_DIR$/payment-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/product-command-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/product-query-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/review-wishlist-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/seller-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/transaction-report-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-service/src/main/java" charset="UTF-8" />

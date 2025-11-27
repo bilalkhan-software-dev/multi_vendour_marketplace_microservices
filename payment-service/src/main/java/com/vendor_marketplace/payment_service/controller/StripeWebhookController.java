@@ -27,7 +27,7 @@ public class StripeWebhookController {
     ) throws StripeException {
         log.info("Stripe success callback received for payment: {}", paymentService);
         paymentService.verifyPaymentAndPublish(paymentSessionId, order_id, PaymentStatus.SUCCESS);
-        return response.createBuildResponse("Payment verified successfully. Thanks for using our service.", order_id, HttpStatus.OK);
+        return response.createBuildResponse("Payment successful! Your order is confirmed.", order_id, HttpStatus.OK);
     }
 
     @PutMapping("/success")
@@ -37,6 +37,6 @@ public class StripeWebhookController {
     ) throws StripeException {
         log.info("Stripe cancel callback received for payment: {}", paymentService);
         paymentService.verifyPaymentAndPublish(paymentSessionId, order_id, PaymentStatus.CANCEL);
-        return response.createErrorResponse("Payment cancelled successfully. Your order is not placed", order_id, HttpStatus.OK);
+        return response.createErrorResponse("Payment cancelled successfully. Your order is cancelled", order_id, HttpStatus.OK);
     }
 }

@@ -41,6 +41,26 @@ spring:
                 - Path=/api/v2/admin/tr/**
                 - Path=/api/v2/reports/**
 
+            - id: order-service
+              uri: lb://ORDER-SERVICE
+              predicates:
+                - Path=/api/v2/user/orders/**
+                - Path=/api/v2/admin/orders/**
+                - Path=/api/v2/seller/orders/**
+
+            - id: payment-service
+              uri: lb://PAYMENT-SERVICE
+              predicates:
+                - Path=/api/v2/user/payment/**
+                - Path=/api/v2/admin/payment/**
+
+            - id: review-wishlist-service
+              uri: lb://REVIEW-WISHLIST-SERVICE
+              predicates:
+                - Path=/api/v2/user/review/**
+                - Path=/api/v2/user/wishlist/**
+                - Path=/api/v2/admin/rw/**
+                - Path=/api/v2/review/public/**
 
 eureka:
   client:
