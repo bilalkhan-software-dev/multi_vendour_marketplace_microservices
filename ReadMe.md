@@ -1,6 +1,6 @@
 # Vendor Marketplace Microservices Architecture 
-## Event-Driven Design with SAGA and CQRS Pattern Implementation
 
+---
 ### 🛒 How This Vendor Marketplace Works
 
 * The backend supports **multiple sellers** and **multiple customers**, managed by **one admin**.
@@ -14,6 +14,9 @@
   * The payment first goes to the **admin’s account**.
   * The admin then **distributes earnings to each seller** using the relevant **Order ID** and **Seller ID**.
 
+ --- 
+
+## Event-Driven Design with SAGA and CQRS Pattern Implementation
 [View on Eraser![](https://app.eraser.io/workspace/3HoiqIF3baeAFIL1cqlW/preview)](https://app.eraser.io/workspace/3HoiqIF3baeAFIL1cqlW)
 
 ## 🏗️ System Architecture Overview
