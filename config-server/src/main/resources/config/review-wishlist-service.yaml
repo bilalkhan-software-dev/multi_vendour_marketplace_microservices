@@ -14,7 +14,7 @@ spring:
 
 feign:
   client:
-    cart-service:
+    product-query-service:
       url: http://localhost:8085
 
 eureka:

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/review/public")
+@RequestMapping("/api/v2/public/review")
 public class ReviewPublicController {
 
     private final ReviewService reviewService;

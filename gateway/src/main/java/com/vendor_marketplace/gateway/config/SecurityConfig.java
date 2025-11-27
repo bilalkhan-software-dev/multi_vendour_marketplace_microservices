@@ -32,7 +32,7 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/swagger-ui/**",
                                 "/api/v2/products/query/**",
-                                "/api/v2/review/public/**",
+                                "/api/v2/public/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .pathMatchers("/api/v2/admin/**").hasRole("ADMIN")

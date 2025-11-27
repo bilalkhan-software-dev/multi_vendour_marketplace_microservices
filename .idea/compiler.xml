@@ -12,7 +12,7 @@
         <module name="eureka" />
         <module name="gateway" />
       </profile>
-      <profile name="Annotation profile for review-wishlist-service" enabled="true">
+      <profile name="Annotation profile for home-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -24,6 +24,7 @@
         <module name="cart-service" />
         <module name="auth-service" />
         <module name="payment-service" />
+        <module name="home-service" />
         <module name="product-command-service" />
         <module name="user-service" />
         <module name="seller-service" />
@@ -44,6 +45,7 @@
       <module name="config-server" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="gateway" options="-parameters" />
+      <module name="home-service" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="payment-service" options="-parameters" />
