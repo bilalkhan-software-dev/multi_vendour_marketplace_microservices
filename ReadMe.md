@@ -1,7 +1,18 @@
 # Vendor Marketplace Microservices Architecture 
 ## Event-Driven Design with SAGA and CQRS Pattern Implementation
 
+### 🛒 How This Vendor Marketplace Works
 
+* The backend supports **multiple sellers** and **multiple customers**, managed by **one admin**.
+* Each seller can **create an account** and **add products** with a **Maximum Retail Price (MRP)**.
+* If a product has a discount, it is **calculated automatically** based on the **MRP and the selling price**.
+* When a user places an order:
+
+  * The system creates **separate order records for each seller**, but all are linked to the **same Order ID**.
+* After payment:
+
+  * The payment first goes to the **admin’s account**.
+  * The admin then **distributes earnings to each seller** using the relevant **Order ID** and **Seller ID**.
 
 [View on Eraser![](https://app.eraser.io/workspace/3HoiqIF3baeAFIL1cqlW/preview)](https://app.eraser.io/workspace/3HoiqIF3baeAFIL1cqlW)
 
