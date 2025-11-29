@@ -33,12 +33,21 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/api/v2/products/query/**",
                                 "/api/v2/public/**",
+                                "/api/v2/reviews/public",
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .pathMatchers("/api/v2/admin/**").hasRole("ADMIN")
-                        .pathMatchers("/api/v2/products/command/**").hasAnyRole("SELLER","ADMIN")
+                        .pathMatchers("/api/v2/admin/payment/**").hasRole("ADMIN")
+
+                        .pathMatchers("/api/v2/products/command/**").hasAnyRole("SELLER", "ADMIN")
                         .pathMatchers("/api/v2/seller/**").hasAnyRole("SELLER", "ADMIN")
+                        .pathMatchers("/api/v2/orders/seller/**").hasAnyRole("SELLER", "ADMIN")
+
                         .pathMatchers("/api/v2/user/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        .pathMatchers("/api/v2/reviews/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        .pathMatchers("/api/v2/wishlists/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        .pathMatchers("/api/v2/payment/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        .pathMatchers("/api/v2/orders/user/**").hasAnyRole("CUSTOMER", "ADMIN")
                         .anyExchange().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, SecurityWebFiltersOrder.AUTHENTICATION)

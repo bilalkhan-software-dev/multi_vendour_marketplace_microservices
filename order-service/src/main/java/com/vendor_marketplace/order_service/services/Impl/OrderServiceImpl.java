@@ -57,6 +57,14 @@ class OrderServiceImpl implements OrderService {
         log.info("Cart retrieved successfully | userId={} | cartId={} | itemCount={}",
                 userId, cart.getId(), cart.getCartItems().size());
 
+        if (cart.getCartItems().isEmpty()) {
+            throw new BusinessException("Your cart is empty. Add product to cart before placing an order");
+        }
+
+        if (cart.getTotalSellingPrice() < 142) {
+            throw new BusinessException("Order is not place because your amount is too low");
+        }
+
         log.debug("Grouping cart items by seller | userId={}", userId);
         Map<String, List<CartResponse.CartItemResponse>> itemsBySeller = cart.getCartItems()
                 .stream()

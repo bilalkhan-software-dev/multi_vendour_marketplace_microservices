@@ -30,7 +30,7 @@ public class Cart {
     private Set<CartItem> cartItems = new HashSet<>();
 
     private int totalSellingPrice;
-    private int totalItems;
+    private int totalItems;  // Changes to totalItemQuantity
     private int totalMrpPrice;
     private double discount;
 

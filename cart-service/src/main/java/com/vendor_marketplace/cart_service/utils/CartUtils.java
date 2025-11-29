@@ -87,6 +87,7 @@ public class CartUtils {
 //            totalItems += cartItem.getQuantity();
 //        }
 
+        // Functional style but less performance if you have less amount of data
         int totalItems = cart.getCartItems().stream().mapToInt(CartItem::getQuantity).sum();
         int totalMrpPrice = cart.getCartItems().stream().mapToInt(CartItem::getMrpPrice).sum();
         int totalSellingPrice = cart.getCartItems().stream().mapToInt(CartItem::getSellingPrice).sum();

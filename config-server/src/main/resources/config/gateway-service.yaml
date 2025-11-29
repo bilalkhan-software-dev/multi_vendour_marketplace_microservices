@@ -44,35 +44,28 @@ spring:
             - id: order-service
               uri: lb://ORDER-SERVICE
               predicates:
-                - Path=/api/v2/user/orders/**
-                - Path=/api/v2/admin/orders/**
-                - Path=/api/v2/seller/orders/**
+                - Path=/api/v2/orders/**
 
             - id: payment-service
               uri: lb://PAYMENT-SERVICE
               predicates:
-                - Path=/api/v2/user/payment/**
-                - Path=/api/v2/admin/payment/**
+                - Path=/api/v2/payment/**,/api/v2/admin/payment/**
 
             - id: review-wishlist-service
               uri: lb://REVIEW-WISHLIST-SERVICE
               predicates:
-                - Path=/api/v2/user/review/**
-                - Path=/api/v2/user/wishlist/**
-                - Path=/api/v2/admin/rw/**
-                - Path=/api/v2/public/review/**
+                - Path=/api/v2/reviews/**,/api/v2/wishlists/**,/api/v2/admin/rw/**
 
             - id: home-service
               uri: lb://HOME-SERVICE
               predicates:
-                - Path=/api/v2/admin/home/**
-                - Path=/api/v2/public/home/**
+                - Path=/api/v2/admin/home/**,/api/v2/public/home/**
 
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761/eureka/}
 
 server:
   port: 2008

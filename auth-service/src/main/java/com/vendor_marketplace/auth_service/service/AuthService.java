@@ -41,7 +41,7 @@ public class AuthService {
     public String registerUser(UserRegisterRequest request) {
         log.info("Registering new user: {}", request.getEmail());
 
-        String authId = createAndGetAuthId(request.getEmail(), request.getFullName(), USER_ROLE.ROLE_CUSTOMER);
+        String authId = createAndGetAuthId(request.getEmail(), request.getFullName(), USER_ROLE.ROLE_CUSTOMER, "For user its not required");
 
         UserCreatedEvent event = UserCreatedEvent.builder()
                 .authId(authId)
@@ -62,8 +62,7 @@ public class AuthService {
     public String registerSeller(SellerRegisterRequest request) {
         log.info("Registering new seller: {}", request.getEmail());
         validateSeller(request.getSTRN());
-        String authId = createAndGetAuthId(request.getEmail(), request.getName(), USER_ROLE.ROLE_SELLER);
-
+        String authId = createAndGetAuthId(request.getEmail(), request.getName(), USER_ROLE.ROLE_SELLER, request.getSTRN());
 
 
         SellerCreatedEvent event = SellerCreatedEvent.builder()
@@ -130,8 +129,6 @@ public class AuthService {
                 .build();
 
     }
-
-
 
 
     public void sendOTPForLogin(String email) {
@@ -222,7 +219,7 @@ public class AuthService {
     }
 
 
-    private String createAndGetAuthId(String email, String name, USER_ROLE role) {
+    private String createAndGetAuthId(String email, String name, USER_ROLE role, String salesTaxRegistrationNumber) {
 
 
         boolean exists = authUserDao.existsByEmail(email);
@@ -236,16 +233,20 @@ public class AuthService {
                 .role(role)
                 .fullName(name)
                 .accountStatus(AccountStatus.ACTIVE)
+                .salesTaxRegistrationNumber(salesTaxRegistrationNumber)
                 .build();
         return authUserDao.save(authUser).getId().toString();
     }
 
     private void validateSeller(String strn) {
-        log.info("Validating seller sales tax registration number: {} ",strn);
-        if (authUserDao.existsBySalesTaxRegistrationNumber(strn)) {
+        log.info("Validating seller sales tax registration number: {} ", strn);
+        boolean exists = authUserDao.existsBySalesTaxRegistrationNumber(strn);
+
+        if (exists) {
             log.warn("Seller with sales tax registration number: {} already exists", strn);
             throw new ExistDataException("Sales Tax Registration already in use");
         }
+
     }
 
     private void validateAccountStatus(AuthUser existUser) {

@@ -8,7 +8,7 @@ import com.vendor_marketplace.review_wishlist_service.models.dto.request.UpdateR
 import com.vendor_marketplace.review_wishlist_service.models.dto.response.ReviewResponse;
 import com.vendor_marketplace.review_wishlist_service.services.ReviewService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +18,13 @@ import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/user/review")
+@RequestMapping("/api/v2/reviews/user")
 public class ReviewController {
 
     private final ReviewService reviewService;
     private final GenericResponseHandler response;
 
-    @PostMapping
+    @PostMapping("/add")
     ResponseEntity<?> addReview(@RequestHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER) String userId, @Valid @RequestBody AddReviewRequest request) {
 
         ReviewResponse added = reviewService.addReview(request, userId);
@@ -36,17 +36,18 @@ public class ReviewController {
 
     @PatchMapping("/{id}")
     ResponseEntity<?> updateReview(@RequestHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER) String userId,
-                                   @PathVariable @NotBlank(message = "Review Id is required") Long id,
+                                   @PathVariable @NotNull(message = "Review Id is required") Long id,
                                    @Valid @RequestBody UpdateReviewRequest request) {
 
         ReviewResponse added = reviewService.updateReview(id, userId, request);
 
-        return response.createBuildResponse("Review updated successfully!", added, HttpStatus.CREATED);
+        return response.createBuildResponse("Review updated successfully!", added, HttpStatus.OK);
 
     }
 
 
-    @GetMapping
+
+    @GetMapping("/")
     ResponseEntity<?> getUserReviews(
             @RequestHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER) String userId,
             @RequestParam(required = false, defaultValue = "0") int page,
@@ -54,13 +55,14 @@ public class ReviewController {
             @RequestParam(required = false, defaultValue = "true") boolean isNewest
     ) {
 
+
         PagedResponse<ReviewResponse> productReviews = reviewService.getUserReviews(userId, page, size, isNewest);
 
         return response.createBuildResponse("Your reviews fetched successfully!", productReviews, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getReviewById(@PathVariable @NotBlank(message = "Review Id is required") Long id) {
+    ResponseEntity<?> getReviewById(@PathVariable @NotNull(message = "Review Id is required") Long id) {
 
         ReviewResponse review = reviewService.getById(id);
 
@@ -70,7 +72,7 @@ public class ReviewController {
     @DeleteMapping("/{id}")
     ResponseEntity<?> deleteReviewById(
             @RequestHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER) String userId,
-            @PathVariable @NotBlank(message = "Review Id is required") Long id) {
+            @PathVariable @NotNull(message = "Review Id is required") Long id) {
 
         reviewService.deleteReview(userId, id);
 

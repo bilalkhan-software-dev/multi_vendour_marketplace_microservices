@@ -18,7 +18,7 @@ import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/seller/orders")
+@RequestMapping("/api/v2/orders/seller")
 public class SellerOrderController {
 
     private final OrderService orderService;

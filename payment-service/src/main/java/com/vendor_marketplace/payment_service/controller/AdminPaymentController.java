@@ -20,7 +20,7 @@ public class AdminPaymentController {
     private final PaymentService paymentService;
     private final GenericResponseHandler response;
 
-    @GetMapping("/")
+    @GetMapping("/all")
     ResponseEntity<?> getAllPayments(
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "20") @Max(value = 40, message = "Maximum size of page is 40") int size,
@@ -42,8 +42,8 @@ public class AdminPaymentController {
 
     }
 
-    @GetMapping("/{id}/orderId")
-    ResponseEntity<?> getPaymentDetailsByOrder(@PathVariable @NotBlank(message = "Order ID is required") String orderId) {
+    @GetMapping("")
+    ResponseEntity<?> getPaymentDetailsByOrder(@RequestParam @NotBlank(message = "Order ID is required") String orderId) {
 
         PaymentResponse paymentDetails = paymentService.getPaymentDetails(orderId);
 
@@ -51,8 +51,8 @@ public class AdminPaymentController {
 
     }
 
-    @GetMapping("/{id}/sessionId")
-    ResponseEntity<?> getPaymentDetailByPaymentSessionId(@PathVariable @NotBlank(message = "Payment Session Id is required") String paymentSessionId) {
+    @GetMapping("")
+    ResponseEntity<?> getPaymentDetailByPaymentSessionId(@RequestParam @NotBlank(message = "Payment Session Id is required") String paymentSessionId) {
 
         PaymentResponse paymentDetails = paymentService.getPaymentDetailByPaymentSessionId(paymentSessionId);
 

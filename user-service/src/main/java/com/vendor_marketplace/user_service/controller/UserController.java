@@ -65,10 +65,10 @@ class UserController {
         return response.createBuildResponse("User details retrieved successfully!", userResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/addresses/{id}")
-    ResponseEntity<?> getUserAddresses(@PathVariable Long id) {
+    @GetMapping("/addresses/{userId}")
+    ResponseEntity<?> getUserAddresses(@PathVariable Long userId) {
 
-        Set<UserAddressResponse> userAddresses = userService.getUserAddress(id);
+        Set<UserAddressResponse> userAddresses = userService.getUserAddress(userId);
 
         return response.createBuildResponse("User addresses retrieved successfully!", userAddresses, HttpStatus.OK);
     }

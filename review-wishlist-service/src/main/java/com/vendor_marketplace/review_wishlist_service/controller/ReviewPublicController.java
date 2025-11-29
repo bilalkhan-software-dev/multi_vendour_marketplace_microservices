@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/public/review")
+@RequestMapping("/api/v2/reviews/public")
 public class ReviewPublicController {
 
     private final ReviewService reviewService;
     private final GenericResponseHandler response;
 
-    @GetMapping
+    @GetMapping()
     ResponseEntity<?> getProductReviews(
             @RequestParam @NotBlank(message = "Product ID is required") String productId,
             @RequestParam(required = false, defaultValue = "0") int page,
@@ -32,9 +32,13 @@ public class ReviewPublicController {
 
         PagedResponse<ReviewResponse> productReviews = reviewService.getProductReviews(productId, page, size, isNewest);
 
+        if (productReviews.getContent().isEmpty()) {
+            return response.createBuildResponse("This product currently has no reviews", productReviews, HttpStatus.OK);
+        }
+
+
         return response.createBuildResponse("Product reviews fetched successfully!", productReviews, HttpStatus.OK);
     }
-
 
 
 }

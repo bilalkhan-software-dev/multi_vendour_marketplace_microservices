@@ -35,6 +35,7 @@ public class JwtUtil {
                 .claims().add(claims)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .subject(id)
+                .issuer("api.vendor-marketplace.com")
                 .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_EXPIRATION))
                 .and()
                 .signWith(getKey())

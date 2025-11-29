@@ -64,7 +64,7 @@ class ProductDaoImpl implements ProductDao {
         // Filter by category (ignore "All")
         if (hasValue(category) && !category.equalsIgnoreCase("All")) {
 
-            categoryRepository.findByCategoryId(category.trim())
+            categoryRepository.findByCategoryIdIgnoreCase(category.trim())
                     .ifPresent(
                             cat -> conditions.add(Criteria.where("category.$id").is(cat.getId()))
                     );
@@ -133,7 +133,7 @@ class ProductDaoImpl implements ProductDao {
     }
 
     /**
-     * Simple keyword search across title, description, category name and id.
+     * Simple keyword search across title, description and category id.
      */
     @Override
     public PagedResponse<ProductResponse> searchProducts(String text, Integer pageNumber) {
@@ -145,7 +145,7 @@ class ProductDaoImpl implements ProductDao {
 
             List<Category> categories = categoryRepository.findByNameContainingIgnoreCase(text);
 
-          List<String> categoryIds  =  categories.stream().map(Category::getId).toList();
+            List<String> categoryIds = categories.stream().map(Category::getId).toList();
 
             query.addCriteria(
                     new Criteria().orOperator(
@@ -229,7 +229,7 @@ class ProductDaoImpl implements ProductDao {
     }
 
     @Override
-    public boolean existByProductId(String productId){
+    public boolean existByProductId(String productId) {
         return productRepository.existsByProductId(productId);
     }
 

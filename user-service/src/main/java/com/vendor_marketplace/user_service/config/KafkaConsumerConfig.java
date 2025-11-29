@@ -1,6 +1,7 @@
 package com.vendor_marketplace.user_service.config;
 
 import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -8,21 +9,37 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.EnableKafkaRetryTopic;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@EnableKafkaRetryTopic
+@Slf4j
 public class KafkaConsumerConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
+
+
+    @Bean
+    public TaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(5);
+        scheduler.setThreadNamePrefix("kafka-retry-scheduler-");
+        scheduler.setDaemon(true);
+        scheduler.initialize();
+        log.info("TaskScheduler initialized for Kafka RetryTopic");
+        return scheduler;
+    }
 
     @Bean
     public ConsumerFactory<String, UserCreatedEvent> consumerFactory() {
@@ -60,14 +77,6 @@ public class KafkaConsumerConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
-    /**
-     *  Dead Letter Recoverer: sends failed records to topic-name-dlt
-     */
-    @Bean
-    public DeadLetterPublishingRecoverer deadLetterPublishingRecoverer(KafkaTemplate<Object, Object> template) {
-        // Default DLT topic name: <original-topic>-dlt
-        return new DeadLetterPublishingRecoverer(template);
-    }
 
 
     @Bean

@@ -24,7 +24,7 @@ public class KafkaProductConsumer {
 
     private final ProductService productService;
 
-    // Consume order cancel update stock event
+    // Consume order cancel, confirm update stock event
     @RetryableTopic(
             attempts = "2",
             backoff = @Backoff(delay = 4000, multiplier = 2.0, maxDelay = 15000),

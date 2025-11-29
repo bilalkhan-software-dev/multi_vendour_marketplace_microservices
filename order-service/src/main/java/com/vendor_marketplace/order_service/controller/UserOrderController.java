@@ -23,7 +23,7 @@ import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/user/orders")
+@RequestMapping("/api/v2/orders/user")
 public class UserOrderController {
 
     private final OrderService orderService;
