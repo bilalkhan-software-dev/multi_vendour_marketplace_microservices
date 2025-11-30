@@ -11,15 +11,8 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - backend
+
+
 
 volumes:
   postgres_data:
-
-networks:
-  backend:
-    driver: bridge
-  default:
-    external:
-      name: auth-service_kafka-network

@@ -8,19 +8,10 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: khan
     ports:
-      - "5434:5432"
+      - "5437:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - backend
 
 
 volumes:
   postgres_data:
-
-networks:
-  backend:
-    driver: bridge
-  default:
-    external:
-      name: auth-service_kafka-network

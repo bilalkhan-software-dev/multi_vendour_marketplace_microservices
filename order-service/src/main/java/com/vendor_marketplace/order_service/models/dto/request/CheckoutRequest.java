@@ -14,7 +14,7 @@ public class CheckoutRequest {
     @NotNull(message = "Address is required")
     private Long addressId;
 
-    @NotBlank(message = "Payment method is required")
+    @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
 
 }

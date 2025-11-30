@@ -51,7 +51,7 @@ public class AdminPaymentController {
 
     }
 
-    @GetMapping("")
+    @GetMapping("/session")
     ResponseEntity<?> getPaymentDetailByPaymentSessionId(@RequestParam @NotBlank(message = "Payment Session Id is required") String paymentSessionId) {
 
         PaymentResponse paymentDetails = paymentService.getPaymentDetailByPaymentSessionId(paymentSessionId);

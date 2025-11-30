@@ -30,7 +30,7 @@ public class StripeWebhookController {
         return response.createBuildResponse("Payment successful! Your order is confirmed.", order_id, HttpStatus.OK);
     }
 
-    @PutMapping("/success")
+    @PutMapping("/cancel")
     ResponseEntity<?> processCancel(
             @RequestParam("session_id") String paymentSessionId,
             @RequestParam String order_id

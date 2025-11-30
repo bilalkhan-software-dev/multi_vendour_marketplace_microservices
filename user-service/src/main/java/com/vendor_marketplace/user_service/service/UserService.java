@@ -79,6 +79,7 @@ public interface UserService {
                 .pinCode(request.getPinCode())
                 .mobile(request.getMobile())
                 .locality(request.getLocality())
+                .address(request.getAddress())
                 .build();
     }
 

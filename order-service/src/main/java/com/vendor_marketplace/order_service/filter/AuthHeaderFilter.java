@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import static com.vendor_marketplace.common.constants.AuthHeaderConstant.*;
 
 @Component
+@Slf4j
 public class AuthHeaderFilter extends OncePerRequestFilter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -28,7 +30,11 @@ public class AuthHeaderFilter extends OncePerRequestFilter {
         String roleHeader = request.getHeader(CUSTOM_USER_ROLE_AUTHORIZATION_HEADER);
         String emailHeader = request.getHeader(CUSTOM_USER_EMAIL_AUTHORIZATION_HEADER);
 
-        if (hasValue(userIdHeader) || hasValue(emailHeader) ) {
+        log.debug("User-Id-Header: {}", userIdHeader);
+        log.debug("User-Roles-Header: {}", roleHeader);
+        log.debug("User-Email-Header: {}", emailHeader);
+
+        if (hasValue(userIdHeader) || hasValue(emailHeader)) {
             sendErrorResponse(response, "Header is required", HttpStatus.UNAUTHORIZED);
             return;
         }
@@ -46,6 +52,7 @@ public class AuthHeaderFilter extends OncePerRequestFilter {
     private void sendErrorResponse(HttpServletResponse response, String message, HttpStatus status) throws IOException {
         GenericResponse genericResponse = GenericResponse.builder()
                 .status("error")
+                .message(message)
                 .data(message)
                 .httpStatus(status)
                 .build();
@@ -56,6 +63,6 @@ public class AuthHeaderFilter extends OncePerRequestFilter {
     }
 
     private boolean hasValue(String request) {
-        return request != null && !request.trim().isEmpty();
+        return request == null || request.trim().isEmpty();
     }
 }

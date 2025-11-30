@@ -26,29 +26,10 @@ public class AuthHeaderFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String userIdHeader = request.getHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER);
-        String roleHeader = request.getHeader(CUSTOM_USER_ROLE_AUTHORIZATION_HEADER);
 
         // Check if user ID header is present and valid
         if (userIdHeader == null || userIdHeader.trim().isEmpty()) {
             sendErrorResponse(response, "User ID header is required", HttpStatus.UNAUTHORIZED);
-            return;
-        }
-
-        // Check if role header is present
-        if (roleHeader == null || roleHeader.trim().isEmpty()) {
-            sendErrorResponse(response, "Role header is required", HttpStatus.UNAUTHORIZED);
-            return;
-        }
-
-        // Validate role - only Customer and ADMIN are allowed
-        try {
-            USER_ROLE role = USER_ROLE.valueOf(roleHeader);
-            if (role != USER_ROLE.ROLE_CUSTOMER && role != USER_ROLE.ROLE_ADMIN) {
-                sendErrorResponse(response, "Invalid Role. Only Customer and ADMIN are allowed", HttpStatus.FORBIDDEN);
-                return;
-            }
-        } catch (IllegalArgumentException e) {
-            sendErrorResponse(response, "Invalid role format", HttpStatus.BAD_REQUEST);
             return;
         }
 
