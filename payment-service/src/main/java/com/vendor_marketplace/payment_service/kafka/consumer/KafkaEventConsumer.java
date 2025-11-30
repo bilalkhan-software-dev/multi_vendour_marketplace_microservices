@@ -2,8 +2,10 @@ package com.vendor_marketplace.payment_service.kafka.consumer;
 
 import com.stripe.exception.StripeException;
 import com.vendor_marketplace.common.dto.event.*;
+import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.payment_service.exception.PaymentException;
 import com.vendor_marketplace.payment_service.services.PaymentService;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.BackOff;
@@ -51,6 +53,8 @@ public class KafkaEventConsumer {
             paymentService.processPaymentCreation(event);
             ack.acknowledge();
             log.info("OrderCreatedEvent processed successfully | orderId={}", event.getOrderId());
+        }catch (PaymentException e) {
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing OrderCreatedEvent | orderId={} | userId={}",
                     event.getOrderId(), event.getCustomerId(), e);

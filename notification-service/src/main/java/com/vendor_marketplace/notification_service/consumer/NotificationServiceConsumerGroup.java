@@ -29,13 +29,13 @@ public class NotificationServiceConsumerGroup {
     // Consumer 1
     @RetryableTopic(
             attempts = "2",
-            backoff = @Backoff(delay = 4000, multiplier = 1.5, maxDelay = 15000),
+            backoff = @Backoff(delay = 5000, multiplier = 2, maxDelay = 30000),
             numPartitions = "3"
     )
     @KafkaListener(
             topics = SEND_NOTIFICATION_TOPIC,
             groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "kafkaListenerContainerFactory"
+            containerFactory = "kafkaListenerContainerFactory" //optional
     )
     public void consumer1(
             @Payload final SendNotificationEvent event,

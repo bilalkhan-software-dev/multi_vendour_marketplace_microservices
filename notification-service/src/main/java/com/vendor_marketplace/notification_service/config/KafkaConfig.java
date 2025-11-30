@@ -1,4 +1,4 @@
-package com.vendor_marketplace.product_query_service.config;
+package com.vendor_marketplace.notification_service.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -12,7 +12,6 @@ import org.springframework.kafka.annotation.EnableKafkaRetryTopic;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.scheduling.TaskScheduler;
@@ -24,7 +23,7 @@ import java.util.Map;
 @Configuration
 @EnableKafkaRetryTopic
 @Slf4j
-public class KafkaConsumerConfig {
+public class KafkaConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -39,9 +38,8 @@ public class KafkaConsumerConfig {
         log.info("TaskScheduler initialized for Kafka RetryTopic");
         return scheduler;
     }
-    /**
-     *  Generic Consumer Factory (handles multiple DTO types dynamically)
-     */
+
+
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
         JsonDeserializer<Object> deserializer = new JsonDeserializer<>();
@@ -60,26 +58,24 @@ public class KafkaConsumerConfig {
 
 
     /**
-     *  Producer Factory for DLT publishing (used internally by recoverer)
+     *  # Official Docs:
+     *  If you don’t specify a kafkaTemplate name a bean with name defaultRetryTopicKafkaTemplate will be looked up. If no bean is found an exception is thrown.
      */
     @Bean
-    public ProducerFactory<Object, Object> producerFactory() {
+    public KafkaTemplate<String, Object> defaultRetryTopicKafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+
+    private ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
         return new DefaultKafkaProducerFactory<>(props);
     }
 
-    @Bean
-    public KafkaTemplate<Object, Object> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
-    }
 
-
-    /**
-     *  Kafka listener container factory
-     */
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
 
@@ -88,6 +84,7 @@ public class KafkaConsumerConfig {
 
         factory.setConsumerFactory(consumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+        factory.setConcurrency(3);
         return factory;
     }
 }

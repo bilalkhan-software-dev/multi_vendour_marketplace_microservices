@@ -27,7 +27,7 @@ public class SellerConsumerService {
     @RetryableTopic(
             attempts = "2",
             exclude = {ExistDataException.class},
-            backoff = @Backoff(delay = 4000, multiplier = 1.5, maxDelay = 15000),
+            backoff = @Backoff(delay = 5000, multiplier = 2, maxDelay = 30000),
             numPartitions = "3"
     )
     @KafkaListener(topics = SELLER_CREATED_TOPIC, groupId = "${spring.kafka.consumer.group-id}")

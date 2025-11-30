@@ -27,7 +27,7 @@ public class KafkaConsumerService {
 
     @RetryableTopic(
             attempts = "3",
-            backoff = @Backoff(delay = 4000, multiplier = 2.0, maxDelay = 15000),
+            backoff = @Backoff(delay = 5000, multiplier = 2.0, maxDelay = 30000),
             numPartitions = "3",
             exclude = IllegalArgumentException.class
     )
@@ -49,6 +49,8 @@ public class KafkaConsumerService {
             productConsumerService.addProduct(event);
             ack.acknowledge();
             log.info("ProductCreateEvent processed successfully | productId={}", event.getProductId());
+        } catch (IllegalArgumentException e) {
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing ProductCreateEvent | productId={} | sellerId={}",
                     event.getProductId(), event.getSellerId(), e);
@@ -58,7 +60,7 @@ public class KafkaConsumerService {
 
     @RetryableTopic(
             attempts = "3",
-            backoff = @Backoff(delay = 4000, multiplier = 2.0, maxDelay = 15000),
+            backoff = @Backoff(delay = 5000, multiplier = 2.0, maxDelay = 30000),
             numPartitions = "3",
             exclude = IllegalArgumentException.class
 
@@ -81,6 +83,8 @@ public class KafkaConsumerService {
             productConsumerService.updateProduct(event);
             ack.acknowledge();
             log.info("ProductUpdateEvent processed successfully | productId={}", event.getProductId());
+        } catch (IllegalArgumentException e) {
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing ProductUpdateEvent | productId={}", event.getProductId(), e);
             throw e; // trigger retry
@@ -89,7 +93,7 @@ public class KafkaConsumerService {
 
     @RetryableTopic(
             attempts = "3",
-            backoff = @Backoff(delay = 4000, multiplier = 2.0, maxDelay = 15000),
+            backoff = @Backoff(delay = 5000, multiplier = 2.0, maxDelay = 30000),
             numPartitions = "3",
             exclude = IllegalArgumentException.class
 
@@ -112,6 +116,8 @@ public class KafkaConsumerService {
             productConsumerService.deleteProductById(event);
             ack.acknowledge();
             log.info("ProductDeleteEvent processed successfully | productId={}", event.getProductId());
+        } catch (IllegalArgumentException e) {
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing ProductDeleteEvent | productId={}", event.getProductId(), e);
             throw e; // trigger retry
@@ -120,7 +126,7 @@ public class KafkaConsumerService {
 
     @RetryableTopic(
             attempts = "3",
-            backoff = @Backoff(delay = 4000, multiplier = 2.0, maxDelay = 15000),
+            backoff = @Backoff(delay = 5000, multiplier = 2.0, maxDelay = 30000),
             numPartitions = "3",
             exclude = IllegalArgumentException.class
     )
@@ -142,6 +148,8 @@ public class KafkaConsumerService {
             productConsumerService.updateStocks(event);
             ack.acknowledge();
             log.info("ProductUpdateStockEvent processed successfully | productId={}", event.getProductId());
+        } catch (IllegalArgumentException e) {
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing ProductUpdateStockEvent | productId={}", event.getProductId(), e);
             throw e; // trigger retry
@@ -158,7 +166,6 @@ public class KafkaConsumerService {
         log.error("DLT received event | key={} | partition={} | offset={} | event={}",
                 key, partition, offset, event);
         String payloadType = event.getClass().getSimpleName();
-
         try {
             if (event instanceof ProductCreateEvent) {
                 log.info("Failed ProductCreateEvent: {}", event);

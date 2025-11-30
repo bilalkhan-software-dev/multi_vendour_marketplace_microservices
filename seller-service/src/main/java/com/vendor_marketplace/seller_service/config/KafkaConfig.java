@@ -1,6 +1,6 @@
-package com.vendor_marketplace.user_service.config;
+package com.vendor_marketplace.seller_service.config;
 
-import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
+import com.vendor_marketplace.common.dto.event.SellerCreatedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -18,17 +18,17 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
 @EnableKafkaRetryTopic
+@Configuration
 @Slf4j
-public class KafkaConsumerConfig {
+public class KafkaConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
-
 
     @Bean
     public TaskScheduler taskScheduler() {
@@ -42,9 +42,23 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, UserCreatedEvent> consumerFactory() {
+    public KafkaTemplate<String, Object> defaultRetryTopicKafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
 
-        JsonDeserializer<UserCreatedEvent> deserializer = new JsonDeserializer<>(UserCreatedEvent.class);
+    private ProducerFactory<String, Object> producerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        return new DefaultKafkaProducerFactory<>(props);
+    }
+
+    @Bean
+    public ConsumerFactory<String, SellerCreatedEvent> consumerFactory() {
+
+        JsonDeserializer<SellerCreatedEvent> deserializer = new JsonDeserializer<>(SellerCreatedEvent.class);
         deserializer.addTrustedPackages("com.vendor_marketplace.common.dto.event");
         deserializer.setRemoveTypeHeaders(false);
         deserializer.setUseTypeMapperForKey(true);
@@ -56,32 +70,12 @@ public class KafkaConsumerConfig {
         configProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         configProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
-        return new DefaultKafkaConsumerFactory<>(configProps,new StringDeserializer(),deserializer);
-    }
-
-
-    /**
-     *  Producer Factory for DLT publishing (used internally by recoverer)
-     */
-    @Bean
-    public ProducerFactory<Object, Object> producerFactory() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        return new DefaultKafkaProducerFactory<>(props);
+        return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(), deserializer);
     }
 
     @Bean
-    public KafkaTemplate<Object, Object> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
-    }
-
-
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, UserCreatedEvent> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, UserCreatedEvent> factory =
+    public ConcurrentKafkaListenerContainerFactory<String, SellerCreatedEvent> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, SellerCreatedEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);

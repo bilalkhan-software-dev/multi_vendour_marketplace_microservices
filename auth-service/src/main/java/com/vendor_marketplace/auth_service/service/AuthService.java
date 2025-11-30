@@ -41,7 +41,7 @@ public class AuthService {
     public String registerUser(UserRegisterRequest request) {
         log.info("Registering new user: {}", request.getEmail());
 
-        String authId = createAndGetAuthId(request.getEmail(), request.getFullName(), USER_ROLE.ROLE_CUSTOMER, "For user its not required");
+        String authId = createAndGetAuthId(request.getEmail(), request.getFullName(), USER_ROLE.ROLE_CUSTOMER, "");
 
         UserCreatedEvent event = UserCreatedEvent.builder()
                 .authId(authId)

@@ -22,7 +22,7 @@ import java.util.Map;
 @Configuration
 @EnableKafkaRetryTopic
 @Slf4j
-public class KafkaConsumerConfig {
+public class KafkaConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -55,17 +55,17 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ProducerFactory<Object, Object> producerFactory() {
+    public KafkaTemplate<String, Object> defaultRetryTopicKafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+
+    private ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class);
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
         return new DefaultKafkaProducerFactory<>(props);
-    }
-
-    @Bean
-    public KafkaTemplate<Object, Object> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
     }
 
     @Bean

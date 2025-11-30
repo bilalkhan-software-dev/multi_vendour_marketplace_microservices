@@ -26,7 +26,11 @@ public class UserConsumerService {
     @RetryableTopic(
             attempts = "2",
             exclude = {ExistDataException.class},
-            backoff = @Backoff(delay = 4000, multiplier = 1.5, maxDelay = 15000),
+            backoff = @Backoff(
+                    delay = 5000,            // Start with 5 seconds
+                    multiplier = 2,          // Double each time: 5s, 10s, 20s
+                    maxDelay = 30000         // Cap at 30 seconds
+            ),
             numPartitions = "3"
     )
     @KafkaListener(topics = USER_CREATED_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
@@ -41,6 +45,7 @@ public class UserConsumerService {
             log.info("Received UserCreatedEvent - Key: {}, Partition: {}, Offset: {}, Email: {}",
                     key, partition, offset, event.getEmail());
 
+
             // Process the event
             userService.registerUser(event);
 
@@ -53,7 +58,7 @@ public class UserConsumerService {
             acknowledgment.acknowledge();
         } catch (Exception e) {
             log.error("Error processing UserCreatedEvent for user: {}", event.getEmail(), e);
-            e.printStackTrace();
+            throw new RuntimeException("Processing failed for user: " + event.getEmail(), e);
         }
     }
 
@@ -65,8 +70,7 @@ public class UserConsumerService {
                           Acknowledgment acknowledgment
     ) {
         log.info("Received UserCreatedEvent DLT - Key: {}, Partition: {}, Offset: {}, Email: {}", key, partition, offset, event.getEmail());
-//        userService.registerUser(event);
-        log.info("Event: {}",event);
+        log.info("Event: {}", event);
         acknowledgment.acknowledge();
     }
 }

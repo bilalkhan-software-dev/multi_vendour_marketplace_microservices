@@ -1,6 +1,5 @@
 package com.vendor_marketplace.order_service.handler;
 
-import com.vendor_marketplace.auth_service.handler.GenericResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

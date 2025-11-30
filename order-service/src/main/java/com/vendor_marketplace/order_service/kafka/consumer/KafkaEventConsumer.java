@@ -54,6 +54,8 @@ public class KafkaEventConsumer {
             orderService.updateOrderAndPaymentStatus(event.getOrderId(), event.getOrderStatus(), event.getPaymentStatus(), event.getEmail());
             ack.acknowledge();
             log.info("PaymentSuccessEvent processed successfully | orderId={}", event.getOrderId());
+        } catch (ResourceNotFoundException | ValidationException e) {
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing PaymentSuccessEvent | orderId={} | email={}",
                     event.getOrderId(), event.getEmail(), e);
@@ -86,6 +88,8 @@ public class KafkaEventConsumer {
             orderService.updateOrderAndPaymentStatus(event.getOrderId(), event.getOrderStatus(), event.getPaymentStatus(), event.getEmail());
             ack.acknowledge();
             log.info("PaymentCancelOrFailEvent processed successfully | orderId={}", event.getOrderId());
+        } catch (ResourceNotFoundException | ValidationException e) {
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing PaymentCancelOrFailEvent | orderId={} | email={}",
                     event.getOrderId(), event.getEmail(), e);

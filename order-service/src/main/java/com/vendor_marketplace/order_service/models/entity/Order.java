@@ -15,13 +15,14 @@ import java.util.List;
 @Setter
 @Entity
 @Builder
+@Table(name = "orders")
 public class Order extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,length = 50)
+    @Column(name = "order_id", nullable = false,length = 50)
     private String orderId;
 
     @Column(nullable = false)
