@@ -6,6 +6,7 @@ import com.vendor_marketplace.review_wishlist_service.models.dto.response.Wishli
 import com.vendor_marketplace.review_wishlist_service.services.WishlistService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,13 +16,13 @@ import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/user/wishlist")
+@RequestMapping("/api/v2/wishlists/user")
 public class WishlistController {
 
     private final WishlistService wishlistService;
     private final GenericResponseHandler response;
 
-    @PostMapping
+    @PostMapping("")
     ResponseEntity<?> addReview(@RequestHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER) String userId, @Valid @RequestBody AddProductToWishlist request) {
 
         WishlistResponse added = wishlistService.addProductToWishlist(userId, request);
@@ -30,7 +31,7 @@ public class WishlistController {
 
     }
 
-    @GetMapping
+    @GetMapping("/")
     ResponseEntity<?> getUserWishlist(
             @RequestHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER) String userId) {
 
@@ -41,7 +42,7 @@ public class WishlistController {
 
     @GetMapping("/{id}")
     ResponseEntity<?> getUserReviews(
-            @PathVariable @NotBlank(message = "Wishlist Id is required") Long id
+            @PathVariable @NotNull(message = "Wishlist Id is required") Long id
     ) {
 
         WishlistResponse wishlist = wishlistService.getWishlistById(id);

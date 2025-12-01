@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ class PaymentServiceImpl implements PaymentService {
     private final PaymentDao paymentDao;
 
     @Override
+    @Transactional
     public void processPaymentCreation(OrderCreatedEvent event) {
 
         PaymentMethod paymentMethod = event.getPaymentMethod();
@@ -92,6 +94,7 @@ class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public void deletePaymentById(Long id) {
 
         boolean exist = paymentDao.existById(id);
@@ -103,17 +106,20 @@ class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public void deletePaymentByOrderId(String orderId) {
 
         boolean exist = paymentDao.existByOrderId(orderId);
         if (!exist) {
             throw new ResourceNotFoundException("Payment not found with Order ID: " + orderId);
         }
+
         paymentDao.deleteByOrderId(orderId);
 
     }
 
     @Override
+    @Transactional
     public void verifyPaymentAndPublish(String paymentSessionId, String orderId, PaymentStatus paymentStatus) throws StripeException {
         log.info("Verify payment for session_id: {}, orderId: {}. payment_status: {}", paymentSessionId, orderId, paymentStatus.name());
 

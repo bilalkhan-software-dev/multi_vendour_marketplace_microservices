@@ -4,17 +4,17 @@ spring:
     url: jdbc:mysql://localhost:3306/cart-service-db
     username: admin
     password: 1234567
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
       hibernate:
-        ddl-auto: update
-      properties:
-        hibernate:
-          show_sql: true
+        show_sql: true
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_SERVICE_URL:http://localhost:8761/eureka/}
 
 server:
   port: 8086

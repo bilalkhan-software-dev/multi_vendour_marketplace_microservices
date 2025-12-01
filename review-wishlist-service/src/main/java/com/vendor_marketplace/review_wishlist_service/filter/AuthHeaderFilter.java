@@ -30,12 +30,12 @@ public class AuthHeaderFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
 
         // public path no need to check header
-        if (requestURI.startsWith("/api/v2/review/public")) {
+        if (requestURI.startsWith("/api/v2/reviews/public")) {
             log.debug("Public endpoint accessed: {}", requestURI);
             filterChain.doFilter(request, response);
             return;
         }
-        log.debug("Private endpoint accessed: {}", requestURI);
+        log.info("Private endpoint accessed: {}", requestURI);
 
         String userIdHeader = request.getHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER);
         String roleHeader = request.getHeader(CUSTOM_USER_ROLE_AUTHORIZATION_HEADER);
@@ -69,7 +69,7 @@ public class AuthHeaderFilter extends OncePerRequestFilter {
     private void sendErrorResponse(HttpServletResponse response, String message, HttpStatus status) throws IOException {
         GenericResponse genericResponse = GenericResponse.builder()
                 .status("error")
-                .data(message)
+                .message(message)
                 .httpStatus(status)
                 .build();
 

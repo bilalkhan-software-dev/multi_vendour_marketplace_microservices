@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ class WishlistServiceImpl implements WishlistService {
 
 
     @Override
+    @Transactional
     public WishlistResponse addProductToWishlist(String userId, AddProductToWishlist request) {
         String productId = request.getProductId();
         log.info("user id: {} add product: {} to wishlist", userId, productId);

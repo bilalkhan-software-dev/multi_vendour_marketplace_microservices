@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import java.util.Map;
 
 import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_USER_ID_AUTHORIZATION_HEADER;
+import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_USER_ROLE_AUTHORIZATION_HEADER;
 
 @FeignClient(
-        name = "cart-service",
-        url = "${feign.client.cart-service.url:http://CART-SERVICE}"
+        name = "cart-service"
+//        , url = "http://localhost:8086"
 )
 public interface CartServiceClient {
 

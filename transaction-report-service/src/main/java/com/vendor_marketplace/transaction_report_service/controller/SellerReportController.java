@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_USER_ID_AUTHORIZATION_HEADER;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v2/reports")
@@ -19,9 +21,9 @@ public class SellerReportController {
     private final SellerReportService reportService;
     private final GenericResponseHandler response;
 
-    @GetMapping("")
+    @GetMapping("/seller")
     ResponseEntity<?> getAllReportsOfTheSeller(
-            @NotNull(message = "Seller id is required") @RequestParam String sellerId,
+            @RequestHeader(CUSTOM_USER_ID_AUTHORIZATION_HEADER) String sellerId,
             @RequestParam(required = false, defaultValue = "0") int pageNo,
             @RequestParam(required = false, defaultValue = "10") int pageSize
     ) {

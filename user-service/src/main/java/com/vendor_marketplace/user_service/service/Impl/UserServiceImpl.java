@@ -12,11 +12,11 @@ import com.vendor_marketplace.user_service.models.dto.response.UserResponse;
 import com.vendor_marketplace.user_service.models.entity.Address;
 import com.vendor_marketplace.user_service.models.entity.User;
 import com.vendor_marketplace.user_service.service.UserService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;

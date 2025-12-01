@@ -7,6 +7,7 @@ import com.vendor_marketplace.order_service.services.OrderService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/admin/orders")
+@RequestMapping("/api/v2/orders/admin")
 public class AdminOrderController {
 
     private final OrderService orderService;
@@ -54,7 +55,7 @@ public class AdminOrderController {
     }
 
     @DeleteMapping("/{id}/order")
-    ResponseEntity<?> deleteOrderById(@PathVariable @NotBlank(message = "Order id is required") Long id) {
+    ResponseEntity<?> deleteOrderById(@PathVariable @NotNull(message = "Order id is required") Long id) {
 
         orderService.deleteOrderById(id);
         return response.createBuildResponseMessage(

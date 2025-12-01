@@ -7,7 +7,8 @@ import java.util.Collections;
 
 public class WishlistMapper {
 
-    private WishlistMapper() {}
+    private WishlistMapper() {
+    }
 
     public static WishlistResponse toWishlistResponse(Wishlist wishlist) {
         return WishlistResponse.builder()
@@ -15,7 +16,7 @@ public class WishlistMapper {
                 .userId(wishlist.getUserId())
                 .createdAt(wishlist.getCreatedAt())
                 .updatedAt(wishlist.getUpdatedAt())
-                .products(wishlist.getProducts().isEmpty() ? Collections.emptyList() : wishlist.getProducts())
+                .products(wishlist.getProductIds().isEmpty() ? Collections.emptySet() : wishlist.getProductIds())
                 .build();
     }
 }

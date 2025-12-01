@@ -1,6 +1,5 @@
 package com.vendor_marketplace.order_service.handler;
 
-import com.vendor_marketplace.common.exception.ExistDataException;
 import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.common.exception.UnauthorizedException;
 import com.vendor_marketplace.order_service.exception.BusinessException;

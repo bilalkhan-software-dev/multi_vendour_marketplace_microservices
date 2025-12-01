@@ -27,7 +27,7 @@ public class KafkaConsumerService {
     @RetryableTopic(
             attempts = "2",
             exclude = ValidationException.class,
-            backOff = @BackOff(delayString = "2s", multiplier = 2.0, maxDelayString = "10s"),
+            backOff = @BackOff(delay = 5000, multiplier = 2.0, maxDelay = 30000),
             numPartitions = "3"
     )
     @KafkaListener(topics = TRANSACTION_CREATED_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
@@ -47,18 +47,18 @@ public class KafkaConsumerService {
             transactionService.savaTransaction(event);
             ack.acknowledge();
             log.info("TransactionCreateEvent processed successfully");
+        } catch (ValidationException e) {
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing TransactionCreateEvent | event={}", event, e);
             throw e; // trigger retry
         }
-
-
     }
 
     @RetryableTopic(
             attempts = "2",
             exclude = ValidationException.class,
-            backOff = @BackOff(delayString = "2s", multiplier = 2.0, maxDelayString = "10s"),
+            backOff = @BackOff(delay = 5000, multiplier = 2.0, maxDelay = 30000),
             numPartitions = "3"
     )
     @KafkaListener(topics = SELLER_REPORT_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
@@ -76,6 +76,8 @@ public class KafkaConsumerService {
             sellerReportService.saveReportWithMonthlyReset(event);
             ack.acknowledge();
             log.info("SellerReportEvent processed successfully");
+        } catch (ValidationException e) {
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing SellerReportEvent | event={}", event, e);
             throw e; // trigger retry
@@ -83,35 +85,27 @@ public class KafkaConsumerService {
 
     }
 
-    @RetryableTopic(
-            attempts = "2",
-            exclude = ValidationException.class,
-            backOff = @BackOff(delayString = "2s", multiplier = 2.0, maxDelayString = "10s"),
-            numPartitions = "3"
-    )
-
     @DltHandler
     public void handleDLT(
-            Object event,
+            @Payload Object event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key,
             @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
-            @Header(KafkaHeaders.OFFSET) Long offset) {
+            @Header(KafkaHeaders.OFFSET) Long offset,Acknowledgment ack) {
 
         log.error("DLT received event | key={} | partition={} | offset={} | event={}",
                 key, partition, offset, event);
         String payloadType = event.getClass().getSimpleName();
 
-        try {
-            if (event instanceof TransactionCreateEvent) {
-                log.info("Failed TransactionCreateEvent: {}", event);
-            } else if (event instanceof SellerReportCreateEvent) {
-                log.info("Failed SellerReportEvent: {}", event);
-            } else {
-                log.warn("Unknown event type in DLT: {}", payloadType);
-            }
-        } catch (Exception e) {
-            log.error("Error handling DLT event | key={} | event={}", key, event, e);
+        if (event instanceof TransactionCreateEvent) {
+            log.info("Failed TransactionCreateEvent: {}", event);
+        } else if (event instanceof SellerReportCreateEvent) {
+            log.info("Failed SellerReportEvent: {}", event);
+        } else {
+            log.warn("Unknown event type in DLT: {}", payloadType);
         }
+
+        ack.acknowledge();
+
     }
 
 

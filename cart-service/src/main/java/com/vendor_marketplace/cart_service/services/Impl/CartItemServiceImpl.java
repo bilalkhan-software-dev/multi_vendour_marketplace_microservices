@@ -32,7 +32,6 @@ public class CartItemServiceImpl implements CartItemService {
     @Transactional
     public CartResponse.CartItemResponse updateCartItem(String userId, Long cartItemId, UpdateCartItemRequest request) {
         log.info("Updating cart item: {} for user: {}", cartItemId, userId);
-
         CartItem cartItem = cartItemDao.findById(cartItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart item not found with id: " + cartItemId));
 
@@ -51,11 +50,10 @@ public class CartItemServiceImpl implements CartItemService {
 
         utils.updateCartTotals(cart);
         cartDao.save(cart);
-
-        CartItem saved = cartItemDao.saveCartItem(cartItem);
         log.info("Successfully updated cart item: {} for user: {}", cartItemId, userId);
 
-        return CartMapper.toCartItemResponse(saved);
+        // Return the updated cartItem managed by JPA benefit of Cascade
+        return CartMapper.toCartItemResponse(cartItem);
     }
 
     @Override

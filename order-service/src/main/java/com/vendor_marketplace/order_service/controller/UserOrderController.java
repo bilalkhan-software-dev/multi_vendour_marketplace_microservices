@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import static com.vendor_marketplace.common.constants.AuthHeaderConstant.CUSTOM_
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/user/orders")
+@RequestMapping("/api/v2/orders/user")
 public class UserOrderController {
 
     private final OrderService orderService;
@@ -69,7 +70,7 @@ public class UserOrderController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getOrderDetailById(@PathVariable @NotBlank(message = "Order id is required") Long id) {
+    ResponseEntity<?> getOrderDetailById(@PathVariable @NotNull(message = "Order id is required") Long id) {
 
         OrderResponse order = orderService.getOrderById(id);
         return response.createBuildResponse("Order detail retrieved successfully", order, HttpStatus.OK);
@@ -77,7 +78,7 @@ public class UserOrderController {
 
 
     @GetMapping("/{id}/item")
-    ResponseEntity<?> getOrderItemDetailById(@PathVariable @NotBlank(message = "Order id is required") Long id) {
+    ResponseEntity<?> getOrderItemDetailById(@PathVariable @NotNull(message = "Order id is required") Long id) {
 
         OrderItemResponse item = orderItemService.findById(id);
         return response.createBuildResponse("Order item detail retrieved successfully", item, HttpStatus.OK);

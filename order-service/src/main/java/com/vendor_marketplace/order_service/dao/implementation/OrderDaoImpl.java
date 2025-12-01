@@ -81,17 +81,17 @@ class OrderDaoImpl implements OrderDao {
 
     @Override
     public void deleteOrderIdOrders(String orderId) {
-        log.info("🗑Deleting orders | orderId={}", orderId);
-        long orderCount = orderRepository.countByOrderId(orderId);
+        log.info("🗑 Deleting orders | orderId={}", orderId);
 
-        if (orderCount == 0) {
-            log.error("No orders found | orderId={}", orderId);
+        List<Order> orders = orderRepository.findByOrderId(orderId);
+
+        if (orders.isEmpty()) {
             throw new ResourceNotFoundException("Order not found with id: " + orderId);
         }
-        log.info("Orders to delete | orderId={} | count={}", orderId, orderCount);
-        int deletedCount = orderRepository.deleteByOrderId(orderId);
-        log.info("Delete completed | orderId={} | deletedCount={}", orderId, deletedCount);
 
+        orderRepository.deleteAll(orders);
+
+        log.info("Delete completed | orderId={} | deletedCount={}", orderId, orders.size());
     }
 
     @Override

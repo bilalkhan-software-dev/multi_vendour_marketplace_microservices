@@ -22,7 +22,6 @@ import com.vendor_marketplace.order_service.models.entity.OrderItem;
 import com.vendor_marketplace.order_service.kafka.publisher.KafkaPublisherService;
 import com.vendor_marketplace.order_service.services.OrderService;
 import com.vendor_marketplace.order_service.utils.OrderUtils;
-import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,6 +56,14 @@ class OrderServiceImpl implements OrderService {
         CartResponse cart = utils.fetchUserCart(userId);
         log.info("Cart retrieved successfully | userId={} | cartId={} | itemCount={}",
                 userId, cart.getId(), cart.getCartItems().size());
+
+        if (cart.getCartItems().isEmpty()) {
+            throw new BusinessException("Your cart is empty. Add product to cart before placing an order");
+        }
+
+        if (cart.getTotalSellingPrice() < 142) {
+            throw new BusinessException("Order is not place because your amount is too low");
+        }
 
         log.debug("Grouping cart items by seller | userId={}", userId);
         Map<String, List<CartResponse.CartItemResponse>> itemsBySeller = cart.getCartItems()
@@ -126,7 +134,7 @@ class OrderServiceImpl implements OrderService {
                 .orderId(orderId)
                 .customerId(userId)
                 .customerEmail(email)
-                .totalAmount(cart.getCartItems().stream().mapToInt(CartResponse.CartItemResponse::getMrpPrice).sum())
+                .totalAmount(cart.getCartItems().stream().mapToInt(CartResponse.CartItemResponse::getSellingPrice).sum())
                 .sellerIds(sellerIds)
                 .build();
         kafkaPublisherService.publishOrderCreatedEvent(event);
@@ -273,7 +281,7 @@ class OrderServiceImpl implements OrderService {
             publishWhenPaymentSuccess(orders);
         }
 
-        sendOrderNotification(orderId, email, orderStatus);
+        sendOrderNotification(orderId, email, orderStatus,paymentStatus);
     }
 
 
@@ -363,7 +371,7 @@ class OrderServiceImpl implements OrderService {
     protected void publishOrderCancelRelatedEvents(List<Order> orders, String orderId, String email) {
         prepareAndPublishSellerReportEvents(orders);
         prepareAndPublishProductUpdateStockEvents(orders);
-        sendOrderNotification(orderId, email, OrderStatus.CANCELLED);
+        sendOrderNotification(orderId, email, OrderStatus.CANCELLED,PaymentStatus.REFUND_REQUEST);
     }
 
     @Async
@@ -408,9 +416,9 @@ class OrderServiceImpl implements OrderService {
         }));
     }
 
-    private void sendOrderNotification(String orderId, String email, OrderStatus orderStatus) {
+    private void sendOrderNotification(String orderId, String email, OrderStatus orderStatus,PaymentStatus paymentStatus) {
 
-        String body = EmailSendingTemplate.sendEmailForOrderStatus(email, orderId, orderStatus.name(), email);
+        String body = EmailSendingTemplate.sendEmailForOrderStatus(email, orderId, orderStatus.name(), email,paymentStatus.name());
         SendNotificationEvent event = SendNotificationEvent.builder()
                 .to(email)
                 .subject("Order Details & Info")

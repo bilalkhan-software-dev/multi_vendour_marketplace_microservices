@@ -10,10 +10,10 @@ import com.vendor_marketplace.cart_service.services.CartService;
 import com.vendor_marketplace.cart_service.utils.CartUtils;
 import com.vendor_marketplace.common.dto.response.CartResponse;
 import com.vendor_marketplace.common.dto.response.ProductResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -68,17 +68,18 @@ public class CartServiceImpl implements CartService {
             cartItem.setMrpPrice(quantity * product.getMrpPrice());
             cartItem.setSellingPrice(quantity * product.getSellingPrice());
             cartItem.setProductSellerId(product.getSellerId());
+
+            //  Add to cart's collection for cascade to work
+            cart.getCartItems().add(cartItem);
         } else {
             // EXISTING ITEM: Update quantity and prices
             utils.updateExistingCartItem(cartItem, quantity, product);
         }
 
-        cart.getCartItems().add(cartItem);
         utils.updateCartTotals(cart);
         cartDao.save(cart);
-        CartItem saved = cartItemDao.saveCartItem(cartItem);
         log.info("Product: {} added to cart item successfullyY for userId: {}", productId, userId);
-        return CartMapper.toCartItemResponse(saved);
+        return CartMapper.toCartItemResponse(cartItem);
     }
 
     private Cart getOrCreateCart(String userId) {

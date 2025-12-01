@@ -12,7 +12,6 @@ import com.vendor_marketplace.seller_service.models.entity.BusinessDetails;
 import com.vendor_marketplace.seller_service.models.entity.Seller;
 import com.vendor_marketplace.seller_service.models.entity.SellerAddress;
 import com.vendor_marketplace.seller_service.services.SellerService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -21,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;

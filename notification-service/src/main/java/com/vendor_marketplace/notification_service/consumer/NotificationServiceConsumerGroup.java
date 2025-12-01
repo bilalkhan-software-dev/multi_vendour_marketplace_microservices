@@ -29,13 +29,13 @@ public class NotificationServiceConsumerGroup {
     // Consumer 1
     @RetryableTopic(
             attempts = "2",
-            backoff = @Backoff(delay = 4000, multiplier = 1.5, maxDelay = 15000),
+            backoff = @Backoff(delay = 5000, multiplier = 2, maxDelay = 30000),
             numPartitions = "3"
     )
     @KafkaListener(
             topics = SEND_NOTIFICATION_TOPIC,
             groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "kafkaListenerContainerFactory"
+            containerFactory = "kafkaListenerContainerFactory" //optional
     )
     public void consumer1(
             @Payload final SendNotificationEvent event,
@@ -108,12 +108,15 @@ public class NotificationServiceConsumerGroup {
     public void listenDLT(SendNotificationEvent event,
                           @Header(KafkaHeaders.RECEIVED_KEY) String key,
                           @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
-                          @Header(KafkaHeaders.OFFSET) Long offset) {
+                          @Header(KafkaHeaders.OFFSET) Long offset,
+                          Acknowledgment ack
+                          ) {
         log.info("Received DLT - Key: {}, Partition: {}, Offset: {}, Email: {}",
                 key, partition, offset, event.getTo());
 
 //            emailService.sendEmail(event);
         log.info("Dlt Event: {}", event);
+        ack.acknowledge();
 
 
     }

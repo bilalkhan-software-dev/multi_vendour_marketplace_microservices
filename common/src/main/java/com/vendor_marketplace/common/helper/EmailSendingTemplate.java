@@ -129,7 +129,7 @@ public class EmailSendingTemplate {
                 """.formatted(name, OTP, frontendUrl);
     }
 
-    public static String sendEmailForOrderStatus(String name, String orderId, String orderStatus, String email) {
+    public static String sendEmailForOrderStatus(String name, String orderId, String orderStatus, String email,String paymentStatus) {
         return """
                 <!DOCTYPE html>
                 <html>
@@ -221,14 +221,12 @@ public class EmailSendingTemplate {
                                 <span class="info-label">Email:</span> %s
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Status:</span>
+                                <span class="info-label">Order Status: %s</span>
+                            </div>
+                             <div class="info-row">
+                                <span class="info-label">Payment Status: %s</span>
                             </div>
                         </div>
-                
-                        <div class="status status-%s">
-                            %s
-                        </div>
-                
                         <p>Thank you for your order! We appreciate your business.</p>
                     </div>
                     <div class="footer">
@@ -236,24 +234,9 @@ public class EmailSendingTemplate {
                     </div>
                 </body>
                 </html>
-                """.formatted(name, orderId, email, getStatusClass(orderStatus), getStatusDisplayText(orderStatus));
+                """.formatted(name, orderId, email, orderStatus,paymentStatus);
     }
 
-    private static String getStatusClass(String status) {
-        return switch (status.toLowerCase()) {
-            case "completed" -> "completed";
-            case "cancelled" -> "cancelled";
-            default -> "pending";
-        };
-    }
-
-    private static String getStatusDisplayText(String status) {
-        return switch (status.toLowerCase()) {
-            case "completed" -> "ORDER COMPLETED";
-            case "cancelled" -> "ORDER CANCELLED";
-            default -> "ORDER PENDING";
-        };
-    }
 
     public static String sendWelcomeEmail(String name) {
         return """

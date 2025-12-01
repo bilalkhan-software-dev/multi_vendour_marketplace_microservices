@@ -33,6 +33,7 @@ class StripeServiceImpl implements StripeService {
     @Override
     public Session createPaymentLinkSession(String orderId, List<String> sellerIds,
                                             String userId, String userEmail, Long totalAmountPKR) {
+        log.info("Creating payment link for ORDER_ID : {} , sellerIds: {} ,user_id: {}, totalAmountPKR: {}", orderId, sellerIds, userId, totalAmountPKR);
 
         // Input validation
         if (totalAmountPKR == null || totalAmountPKR <= 0) {
@@ -47,6 +48,12 @@ class StripeServiceImpl implements StripeService {
             );
         }
 
+        // Convert PKR to cents for Stripe (1 PKR = 100 cents)
+        log.info("Converting PKR To cents * 100");
+        long amountInCents = totalAmountPKR * 100;
+        log.info("Amount after converting to cents: {}  Original : {}", amountInCents, totalAmountPKR);
+
+
         try {
             SessionCreateParams params = SessionCreateParams.builder()
                     .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
@@ -54,13 +61,14 @@ class StripeServiceImpl implements StripeService {
                     .setSuccessUrl(buildSuccessUrl(orderId))
                     .setCancelUrl(buildCancelUrl(orderId))
                     .setCustomerEmail(userEmail)
-                    .addLineItem(createLineItem(orderId, totalAmountPKR))
+                    .addLineItem(createLineItem(orderId, amountInCents))
                     .putMetadata("order_id", orderId)
                     .putMetadata("user_id", userId)
                     .putMetadata("order_email", userEmail)
                     .putMetadata("total_sellers", String.valueOf(sellerIds.size()))
                     .putMetadata("seller_ids", String.join(",", sellerIds))
                     .putMetadata("original_amount_pkr", totalAmountPKR.toString())
+                    .putMetadata("amount_cents", String.valueOf(amountInCents))
                     .build();
 
             Session session = Session.create(params);
