@@ -25,19 +25,16 @@ public class SecurityConfig {
         return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(
-                                "/api/v2/auth/register/**",
-                                "/api/v2/auth/login",
-                                "/api/v2/auth/send/otp",
-                                "/api/v2/auth/check-email/**",
+                                "/api/v2/auth/**",
                                 "/actuator/health",
                                 "/swagger-ui/**",
                                 "/api/v2/products/query/**",
                                 "/api/v2/public/**",
                                 "/api/v2/reviews/public",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/actuator/**"
                         ).permitAll()
                         .pathMatchers("/api/v2/admin/**").hasRole("ADMIN")
-                        .pathMatchers("/api/v2/admin/payment/**").hasRole("ADMIN")
 
                         .pathMatchers("/api/v2/products/command/**").hasAnyRole("SELLER", "ADMIN")
                         .pathMatchers("/api/v2/seller/**").hasAnyRole("SELLER", "ADMIN")

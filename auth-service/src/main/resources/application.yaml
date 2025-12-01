@@ -3,3 +3,28 @@ spring:
     name: auth-service
   config:
     import: optional:configserver:http://localhost:2007
+  kafka:
+    bootstrap-servers:  ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:29093}
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:5434/auth-service-db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:khan}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+  data:
+    redis:
+      repositories:
+        enabled: false
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY:6pQm/8nXkz1uD0mU5wXrZ4qV9rG7dJk8aLfP9nQw1yZ2xThB9cN4qR5vY7uK3mP0}
+
+server:
+  port: 8082

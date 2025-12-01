@@ -3,3 +3,32 @@ spring:
     name: user-service
   config:
     import: optional:configserver:http://localhost:2007
+  kafka:
+    bootstrap-servers:  ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:29093}
+    consumer:
+      group-id: user-service-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:5432/user-service-db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:khan}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+
+admin:
+  info:
+    name: ${ADMIN_NAME}
+    email: ${ADMIN_EMAIL}
+    mobile: ${ADMIN_MOBILE}
+
+
+server:
+  port: 8080

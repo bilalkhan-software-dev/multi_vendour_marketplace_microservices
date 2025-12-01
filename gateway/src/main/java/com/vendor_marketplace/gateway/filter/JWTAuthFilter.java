@@ -43,7 +43,8 @@ public class JWTAuthFilter implements WebFilter {
             "/api/v2/auth/login",
             "/api/v2/products/query",
             "/api/v2/reviews/public",
-            "/actuator/health",
+            "/api/v2/public/home",
+            "/actuator",
             "/swagger-ui/",
             "/v3/api-docs/"
     );

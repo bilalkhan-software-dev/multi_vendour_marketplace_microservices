@@ -6,8 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "product-query-service",
-        url = "${feign.client.product-query-service.url:http://PRODUCT-QUERY-SERVICE}")
+@FeignClient(name = "product-query-service")
 public interface ProductServiceClient {
 
     @GetMapping("/api/v2/products/query/{id}/exist")

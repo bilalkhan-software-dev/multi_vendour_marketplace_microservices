@@ -3,4 +3,11 @@ spring:
     name: home-service
   config:
     import: optional:configserver:http://localhost:2007
+  data:
+    mongodb:
+      auto-index-creation: true
+  mongodb:
+    uri: ${MONGODB_URL:mongodb://admin:password123@localhost:27019/home-service-db?authSource=admin}
 
+server:
+  port: 8091

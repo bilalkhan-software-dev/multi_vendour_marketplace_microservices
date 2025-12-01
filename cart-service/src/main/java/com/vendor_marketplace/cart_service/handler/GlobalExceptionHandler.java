@@ -3,6 +3,7 @@ package com.vendor_marketplace.cart_service.handler;
 import com.vendor_marketplace.common.exception.ExistDataException;
 import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.common.exception.UnsufficientStockException;
+import feign.FeignException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,12 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toList());
         log.warn("Validation failed: {}", errors);
         return response.createErrorResponse("Validation Failed!", errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FeignException.ServiceUnavailable.class)
+    public ResponseEntity<?> handleServiceUnavailable(FeignException.ServiceUnavailable ex) {
+        log.warn("Feign Service unavailable: {}", ex.getMessage());
+        return response.createErrorResponseMessage("Product service is temporarily unavailable", HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
@@ -99,6 +106,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException ex) {
         log.warn("Illegal argument: {}", ex.getMessage());
         return response.createErrorResponseMessage(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<?> handleFeignExceptionUnavailable(FeignException ex) {
+        log.warn("FeignException occurred: {}", ex.getMessage());
+        return response.createErrorResponseMessage("Error communicating with external service", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(Exception.class)

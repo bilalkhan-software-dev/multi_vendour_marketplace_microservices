@@ -3,7 +3,21 @@ spring:
     name: review-wishlist-service
   config:
     import: optional:configserver:http://localhost:2007
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:5437/review-wishlist-service-db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:khan}
 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+
+server:
+  port: 8090
 
 
 

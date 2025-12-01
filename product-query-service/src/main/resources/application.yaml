@@ -3,3 +3,17 @@ spring:
     name: product-query-service
   config:
     import: optional:configserver:http://localhost:2007
+  data:
+    mongodb:
+      uri: ${MONGODB_URL:mongodb://admin:password123@localhost:27018/product-query-service-db?authSource=admin}
+      auto-index-creation: true
+  kafka:
+    bootstrap-servers:  ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:29093}
+    consumer:
+      group-id: product-query-service-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+
+
+server:
+  port: 8085

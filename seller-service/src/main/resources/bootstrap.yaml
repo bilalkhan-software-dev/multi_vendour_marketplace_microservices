@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    config:
+      uri: http://localhost:2007
+      name: application
+      profile: default
+      fail-fast: true

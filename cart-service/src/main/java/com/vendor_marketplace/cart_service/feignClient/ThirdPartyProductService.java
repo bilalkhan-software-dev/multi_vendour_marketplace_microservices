@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Map;
 
-@FeignClient(name = "product-query-service",url = "http://localhost:8085/api/v2/products/query")
+@FeignClient(name = "product-query-service")
 public interface ThirdPartyProductService {
 
-    @GetMapping("/{id}")
+    @GetMapping("/api/v2/products/query/{id}")
     ResponseEntity<Map<String,Object>> getProductDetails(@PathVariable String id);
 
 
