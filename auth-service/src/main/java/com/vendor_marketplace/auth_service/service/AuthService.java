@@ -20,10 +20,10 @@ import com.vendor_marketplace.auth_service.utils.RedisUtil;
 import com.vendor_marketplace.common.dto.event.SellerCreatedEvent;
 import com.vendor_marketplace.common.dto.event.SendNotificationEvent;
 import com.vendor_marketplace.common.dto.event.UserCreatedEvent;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

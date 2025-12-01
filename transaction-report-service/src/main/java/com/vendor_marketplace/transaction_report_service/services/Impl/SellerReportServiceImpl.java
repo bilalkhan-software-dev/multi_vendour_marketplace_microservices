@@ -35,17 +35,19 @@ public class SellerReportServiceImpl implements SellerReportService {
         if (existingReport == null) {
             log.info("No existing report found for seller ID: {}. Creating new report.", event.getSellerId());
             createNewReport(event);
-        } else if (isReportOlderThan30Days(existingReport.getCreatedAt())) {
+        } else if (existingReport.getCreatedAt() != null && isReportOlderThan30Days(existingReport.getCreatedAt())) {
             long daysOld = ChronoUnit.DAYS.between(existingReport.getCreatedAt(), LocalDateTime.now());
             log.info("Report for seller ID: {} is {} days old (created on {}). Creating new monthly report.",
                     event.getSellerId(), daysOld, formatDate(existingReport.getCreatedAt()));
             createNewReport(event);
         } else {
+            LocalDateTime createdAt = existingReport.getCreatedAt();
+            String createdAtFormatted = (createdAt != null) ? formatDate(createdAt) : "unknown date";
+
             log.debug("Updating existing report for seller ID: {} (created on {})",
-                    event.getSellerId(), formatDate(existingReport.getCreatedAt()));
+                    event.getSellerId(), createdAtFormatted);
             updateExistingReport(existingReport, event);
         }
-
         log.info("Successfully processed seller report for seller ID: {}", event.getSellerId());
     }
 

@@ -27,7 +27,7 @@ public class KafkaConsumerService {
     @RetryableTopic(
             attempts = "2",
             exclude = ValidationException.class,
-            backOff = @BackOff(delayString = "2s", multiplier = 2.0, maxDelayString = "10s"),
+            backOff = @BackOff(delay = 5000, multiplier = 2.0, maxDelay = 30000),
             numPartitions = "3"
     )
     @KafkaListener(topics = TRANSACTION_CREATED_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
@@ -58,7 +58,7 @@ public class KafkaConsumerService {
     @RetryableTopic(
             attempts = "2",
             exclude = ValidationException.class,
-            backOff = @BackOff(delayString = "2s", multiplier = 2.0, maxDelayString = "10s"),
+            backOff = @BackOff(delay = 5000, multiplier = 2.0, maxDelay = 30000),
             numPartitions = "3"
     )
     @KafkaListener(topics = SELLER_REPORT_TOPIC, groupId = "${spring.kafka.consumer.group-id}")
@@ -87,10 +87,10 @@ public class KafkaConsumerService {
 
     @DltHandler
     public void handleDLT(
-            Object event,
+            @Payload Object event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key,
             @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
-            @Header(KafkaHeaders.OFFSET) Long offset) {
+            @Header(KafkaHeaders.OFFSET) Long offset,Acknowledgment ack) {
 
         log.error("DLT received event | key={} | partition={} | offset={} | event={}",
                 key, partition, offset, event);
@@ -103,6 +103,8 @@ public class KafkaConsumerService {
         } else {
             log.warn("Unknown event type in DLT: {}", payloadType);
         }
+
+        ack.acknowledge();
 
     }
 

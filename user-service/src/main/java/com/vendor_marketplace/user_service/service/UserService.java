@@ -9,7 +9,6 @@ import com.vendor_marketplace.user_service.models.dto.response.UserAddressRespon
 import com.vendor_marketplace.user_service.models.dto.response.UserResponse;
 import com.vendor_marketplace.user_service.models.entity.Address;
 import com.vendor_marketplace.user_service.models.entity.User;
-import jakarta.transaction.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,20 +17,16 @@ import java.util.stream.Collectors;
 public interface UserService {
 
 
-    @Transactional
     UserResponse registerUser(UserCreatedEvent request);
 
     UserResponse getUserById(Long id);
 
-    @Transactional
     void deleteUser(Long userId);
 
-    @Transactional
     UserResponse addAddressToUser(Long userId, AddressRequest request);
 
     Set<UserAddressResponse> getUserAddress(Long userId);
 
-    @Transactional
     UserResponse updateUser(UpdateUserRequest request);
 
     boolean isUserExistWithById(Long id);

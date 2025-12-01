@@ -108,12 +108,15 @@ public class NotificationServiceConsumerGroup {
     public void listenDLT(SendNotificationEvent event,
                           @Header(KafkaHeaders.RECEIVED_KEY) String key,
                           @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
-                          @Header(KafkaHeaders.OFFSET) Long offset) {
+                          @Header(KafkaHeaders.OFFSET) Long offset,
+                          Acknowledgment ack
+                          ) {
         log.info("Received DLT - Key: {}, Partition: {}, Offset: {}, Email: {}",
                 key, partition, offset, event.getTo());
 
 //            emailService.sendEmail(event);
         log.info("Dlt Event: {}", event);
+        ack.acknowledge();
 
 
     }

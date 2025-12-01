@@ -32,12 +32,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("now") LocalDateTime now
     );
 
-    long countByOrderId(String orderId);
-
-    @Modifying
-    @Query("DELETE FROM Order o WHERE o.orderId = :orderId")
-    int deleteByOrderId(@Param("orderId") String orderId);
-
     boolean existsByOrderIdAndCreatedAtBefore(String orderId, LocalDateTime createdAt);
 
     boolean existsByOrderId(String orderId);

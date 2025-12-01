@@ -40,6 +40,7 @@ public interface OrderService {
     static boolean isNonCancellableStatus(Order order) {
         OrderStatus status = order.getOrderStatus();
         return status == OrderStatus.SHIPPED ||
+                status == OrderStatus.PENDING ||
                 status == OrderStatus.DELIVERED ||
                 status == OrderStatus.OUT_FOR_DELIVERY ||
                 status == OrderStatus.CANCELLED ||

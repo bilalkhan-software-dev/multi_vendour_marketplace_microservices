@@ -1,11 +1,8 @@
 package com.vendor_marketplace.payment_service.kafka.consumer;
 
-import com.stripe.exception.StripeException;
 import com.vendor_marketplace.common.dto.event.*;
-import com.vendor_marketplace.common.exception.ResourceNotFoundException;
 import com.vendor_marketplace.payment_service.exception.PaymentException;
 import com.vendor_marketplace.payment_service.services.PaymentService;
-import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.BackOff;
@@ -53,7 +50,7 @@ public class KafkaEventConsumer {
             paymentService.processPaymentCreation(event);
             ack.acknowledge();
             log.info("OrderCreatedEvent processed successfully | orderId={}", event.getOrderId());
-        }catch (PaymentException e) {
+        } catch (PaymentException e) {
             ack.acknowledge();
         } catch (Exception e) {
             log.error("Error processing OrderCreatedEvent | orderId={} | userId={}",
@@ -65,23 +62,19 @@ public class KafkaEventConsumer {
 
     @DltHandler
     public void handleDLT(
-            Object event,
+            @Payload Object event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key,
             @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
-            @Header(KafkaHeaders.OFFSET) Long offset) {
+            @Header(KafkaHeaders.OFFSET) Long offset, Acknowledgment ack) {
 
-        log.error("DLT received event | key={} | partition={} | offset={} | event={}",
-                key, partition, offset, event);
-        String payloadType = event.getClass().getSimpleName();
-
-        try {
-            if (event instanceof OrderCreatedEvent) {
-                log.info("Failed OrderCreatedEvent: {}", event);
-            } else {
-                log.warn("Unknown event type in DLT: {}", payloadType);
-            }
-        } catch (Exception e) {
-            log.error("Error handling DLT event | key={} | event={}", key, event, e);
+        log.error("DLT received event | key={} | partition={} | offset={}", key, partition, offset);
+        ack.acknowledge();
+        if (event instanceof OrderCreatedEvent orderEvent) {
+            log.info("Failed Order: ID={}, Amount={}, User={} sellerIds: {}",
+                    orderEvent.getOrderId(), orderEvent.getTotalAmount(),
+                    orderEvent.getCustomerId(), orderEvent.getSellerIds());
+        } else {
+            log.warn("Unknown event type in DLT: {}", event.getClass().getSimpleName());
         }
     }
 }

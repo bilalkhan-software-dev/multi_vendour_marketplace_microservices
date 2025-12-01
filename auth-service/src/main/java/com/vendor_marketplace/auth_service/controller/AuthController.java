@@ -69,8 +69,8 @@ public class AuthController {
 
     @GetMapping("/users")
     ResponseEntity<?> getUsers(
-            @RequestParam(required = false, defaultValue = "10") Integer page,
-            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "20") Integer size,
             @RequestParam(required = false) String sort
     ) {
         List<AuthUserResponse> authUsers = authService.allAuthUsers(page, size, sort);

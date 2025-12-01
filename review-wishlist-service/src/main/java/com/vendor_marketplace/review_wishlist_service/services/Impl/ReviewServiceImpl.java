@@ -13,11 +13,11 @@ import com.vendor_marketplace.review_wishlist_service.models.entity.Review;
 import com.vendor_marketplace.review_wishlist_service.services.ReviewService;
 
 import com.vendor_marketplace.review_wishlist_service.utils.PageUtils;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 

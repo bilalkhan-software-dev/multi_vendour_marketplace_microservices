@@ -20,7 +20,7 @@ public class StripeWebhookController {
     private final PaymentService paymentService;
     private final GenericResponseHandler response;
 
-    @PutMapping("/success")
+    @GetMapping("/success")
     ResponseEntity<?> processSuccess(
             @RequestParam("session_id") String paymentSessionId,
             @RequestParam String order_id
@@ -30,8 +30,8 @@ public class StripeWebhookController {
         return response.createBuildResponse("Payment successful! Your order is confirmed.", order_id, HttpStatus.OK);
     }
 
-    @PutMapping("/cancel")
-    ResponseEntity<?> processCancel(
+    @GetMapping("/cancel")
+     ResponseEntity<?> processCancel(
             @RequestParam("session_id") String paymentSessionId,
             @RequestParam String order_id
     ) throws StripeException {

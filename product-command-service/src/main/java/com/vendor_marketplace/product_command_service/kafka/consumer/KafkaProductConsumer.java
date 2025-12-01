@@ -64,7 +64,7 @@ public class KafkaProductConsumer {
             Object event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key,
             @Header(KafkaHeaders.RECEIVED_PARTITION) Integer partition,
-            @Header(KafkaHeaders.OFFSET) Long offset) {
+            @Header(KafkaHeaders.OFFSET) Long offset, Acknowledgment ack) {
 
         log.error("DLT received event | key={} | partition={} | offset={} | event={}",
                 key, partition, offset, event);
@@ -75,6 +75,7 @@ public class KafkaProductConsumer {
             } else {
                 log.warn("Unknown event type in DLT: {}", payloadType);
             }
+            ack.acknowledge();
         } catch (Exception e) {
             log.error("Error handling DLT event | key={} | event={}", key, event, e);
         }

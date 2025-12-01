@@ -37,9 +37,7 @@ spring:
             - id: transaction-report-service
               uri: lb://TRANSACTION-REPORT-SERVICE
               predicates:
-                - Path=/api/v2/transactions/**
-                - Path=/api/v2/admin/tr/**
-                - Path=/api/v2/reports/**
+                - Path=/api/v2/transactions/**,/api/v2/admin/tr/**,/api/v2/reports/**
 
             - id: order-service
               uri: lb://ORDER-SERVICE

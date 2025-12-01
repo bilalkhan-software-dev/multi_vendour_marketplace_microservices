@@ -10,10 +10,10 @@ import com.vendor_marketplace.cart_service.services.CartService;
 import com.vendor_marketplace.cart_service.utils.CartUtils;
 import com.vendor_marketplace.common.dto.response.CartResponse;
 import com.vendor_marketplace.common.dto.response.ProductResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
