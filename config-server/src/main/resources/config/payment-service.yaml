@@ -19,7 +19,7 @@ spring:
         show_sql: true
 
 stripe:
-  secret-key: ${STRIPE_SECRET_KEY:sk_test_51SWhU9As5ybJL7ryX9VyNefH2Kl8VbxjcFXaMc0U9m9k3NMLwwEgVRepwuSFiZilO0v4WOp2OFrpt29gThlu3F8800NJeE7unm} # Add default empty value
+  secret-key: ${STRIPE_SECRET_KEY}
   success-url: ${BASE_URL:http://localhost:8089}/api/v2/webhook/stripe/success
   cancel-url: ${BASE_URL:http://localhost:8089}/api/v2/webhook/stripe/cancel
 
