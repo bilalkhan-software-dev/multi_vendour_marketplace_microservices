@@ -19,6 +19,37 @@
 ## Event-Driven Design with SAGA and CQRS Pattern Implementation
 [View on Eraser![](https://app.eraser.io/workspace/3HoiqIF3baeAFIL1cqlW/preview)](https://app.eraser.io/workspace/3HoiqIF3baeAFIL1cqlW)
 
+
+## **Product Service - CQRS Architecture**
+![Product Service CQRS Architecture](image/product-service-cqrs-architecture.png)
+
+**Architecture Overview:**
+- **Command Side**: Handles write operations (Create, Update, Delete)
+- **Query Side**: Handles read operations with optimized queries
+- **Event Bus**: Asynchronous communication between command and query sides
+- **Read Models**: Materialized views for optimized queries
+
+## **Order Payment Service - SAGA Pattern**
+![Order Payment SAGA Architecture](image/order-payment-saga-architecture.png)
+
+**SAGA Pattern Implementation:**
+- **Choreography-based SAGA**: Services communicate via events
+- **Compensating Transactions**: Each step has a compensating action
+- **Eventual Consistency**: Guarantees consistency across services
+- **Failure Recovery**: Automatic rollback on failures
+
+## **Order Cancellation Flow - Event-Driven Architecture**
+![Order Cancellation Architecture](image/order-cancel-architecture.png)
+
+## **Benefits of This Architecture**
+
+1. **Scalability**: Independent scaling of read/write operations
+2. **Resilience**: Failure isolation between services
+3. **Performance**: Optimized data models for specific operations
+4. **Maintainability**: Clear separation of concerns
+5. **Flexibility**: Easy to add new features without breaking existing ones
+
+
 ## 🏗️ System Architecture Overview
 
 ### **Core Infrastructure Components**
@@ -53,11 +84,11 @@ The system follows a microservices architecture with Database Per Service patter
 ## Core Services & Databases
 
 #### **user-service**
-- **Database**: PostgreSQL
+- **Database**: PostgresSQL
 - Handles user management and profiles
 
 #### **seller-service**
-- **Database**: PostgreSQL
+- **Database**: PostgresSQL
 - Manages seller accounts and information
 
 #### **product-service** → **CQRS Pattern**
@@ -66,11 +97,11 @@ The system follows a microservices architecture with Database Per Service patter
 - Handles product catalog and inventory
 
 #### **order-service**
-- **Database**: PostgreSQL
+- **Database**: PostgresSQL
 - Manages order processing and order lifecycle
 
 #### **payment-service**
-- **Database**: PostgreSQL
+- **Database**: PostgresSQL
 - Handles payment processing and transactions
 
 #### **cart-service**
@@ -78,24 +109,20 @@ The system follows a microservices architecture with Database Per Service patter
 - Manages shopping cart functionality with fast in-memory storage
 
 #### **auth-service**
-- **Database**: PostgreSQL + Redis
+- **Database**: PostgresSQL + Redis
 - **Functionality**: Handles register, login, generate token
 - Uses Redis for session management and token storage
 
-#### **coupon-service**
-- **Database**: PostgreSQL
-- Manages discount coupons and promotional codes
-
 #### **review-wishlist-service**
-- **Database**: PostgreSQL
+- **Database**: PostgresSQL
 - Handles product reviews and ratings
 
 #### **chatbot-service — In Progress**
 - **Database**: MongoDB
 - Manages AI chatbot interactions and conversations
 
-#### **seller_report_transaction-service**
-- **Database**: PostgreSQL
+#### **transaction-report-service**
+- **Database**: PostgresSQL
 - Handles seller reporting and transaction analytics
 
 #### **home-service** 
@@ -114,7 +141,7 @@ The system follows a microservices architecture with Database Per Service patter
 In a distributed microservices environment, traditional ACID transactions across multiple services are not feasible. The order creation and payment processing need to be coordinated across:
 - **order-service** (creates order)
 - **payment-service** (processes payment)
-- **inventory-service** (updates stock)
+- **inventory-service(product-service)** (updates stock)
 
 #### **Saga Implementation - Choreography Pattern**
 
@@ -147,38 +174,6 @@ In a distributed microservices environment, traditional ACID transactions across
 - **70% of users** browse products (read-heavy operations)
 - **30% of users** actually make purchases (write operations)
 - This creates a **read-write disparity** that needs efficient handling
-
-#### **Kafka Implementation Benefits:**
-
-**1. Data Consistency Between Services**
-```
-Auth Service → UserCreatedEvent → User Service
-Auth Service → SellerCreatedEvent → Seller Service
-Order Service → OrderCreatedEvent → Payment Service
-```
-
-**2. Read-Write Optimization**
-- **Write Path**: Fast acknowledgment to users
-- **Read Path**: Asynchronous propagation to read models
-- **CQRS in product-service**: Separates read and write concerns
-
-**3. Scalability for Browsing Traffic**
-- Product catalog reads can be scaled independently
-- Event sourcing maintains audit trail
-- Real-time inventory updates
-
-#### **Event Flow Examples:**
-
-**User Registration Flow:**
-1. Frontend → API Gateway → Auth Service
-2. Auth Service creates auth record + publishes `UserCreatedEvent`
-3. User Service consumes event → creates user profile
-4. Response returned to user immediately (eventual consistency)
-
-**Seller Registration Flow:**
-1. Frontend → API Gateway → Auth Service
-2. Auth Service creates auth record + publishes `SellerCreatedEvent`
-3. Seller Service consumes event → creates seller profile
 
 ## Infrastructure Components
 
