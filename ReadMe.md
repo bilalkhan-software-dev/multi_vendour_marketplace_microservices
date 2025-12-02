@@ -21,7 +21,7 @@
 
 
 ## **Product Service - CQRS Architecture**
-![Product Service CQRS Architecture](image/product-service-cqrs-architecture.png)
+![Product Service CQRS Architecture](images/product-service-cqrs-architecture.png)
 
 **Architecture Overview:**
 - **Command Side**: Handles write operations (Create, Update, Delete)
@@ -30,7 +30,7 @@
 - **Read Models**: Materialized views for optimized queries
 
 ## **Order Payment Service - SAGA Pattern**
-![Order Payment SAGA Architecture](image/order-payment-saga-architecture.png)
+![Order Payment SAGA Architecture](images/order-payment-saga-architecture.png)
 
 **SAGA Pattern Implementation:**
 - **Choreography-based SAGA**: Services communicate via events
@@ -39,7 +39,7 @@
 - **Failure Recovery**: Automatic rollback on failures
 
 ## **Order Cancellation Flow - Event-Driven Architecture**
-![Order Cancellation Architecture](image/order-cancel-architecture.png)
+![Order Cancellation Architecture](images/order-cancel-architecture.png)
 
 ## **Benefits of This Architecture**
 
