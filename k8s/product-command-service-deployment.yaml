@@ -1,21 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cart-service
+  name: product-command-service
 spec:
   selector:
     matchLabels:
-      app: cart-service
+      app: product-command-service
   template:
     metadata:
       labels:
-        app: cart-service
+        app: product-command-service
     spec:
       containers:
-        - name: cart-service
-          image: bilalkhandevse/microservices-vendormarketplace-cart-service:latest
+        - name: product-command-service
+          image: bilalkhandevse/microservices-vendormarketplace-product-command-service:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 8086
+            - containerPort: 8084
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -28,11 +29,17 @@ spec:
                   name: eureka-cm
                   key: eureka_server_address
 
-            - name: DB_HOST
+            - name: MONGODB_URL
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-cm
-                  key: hostname
+                  name: mongodb-cm
+                  key: mongodb-url
+
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: bootstrap_servers
 
           resources:
             requests:
@@ -46,10 +53,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cart-service-svc
+  name: product-command-service-svc
 spec:
   selector:
-    app: cart-service
+    app: product-command-service
   ports:
     - port: 80
-      targetPort: 8086
+      targetPort: 8084

@@ -16,7 +16,7 @@ spec:
           image: bilalkhandevse/microservices-vendormarketplace-config-server:latest
           ports:
             - containerPort: 2007
-            
+
           resources:
             requests:
               memory: "128Mi"
@@ -24,3 +24,15 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "200m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-server-svc
+spec:
+  selector:
+    app: config-server
+  ports:
+    - port: 80
+      targetPort: 2007

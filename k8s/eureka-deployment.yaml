@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka # Headless Service (clusterIP: None)
+spec:
+  clusterIP: None # ← This makes it headless.  Creates DNS records for each pod: eureka-0.eureka, eureka-1.eureka
+  selector:
+    app: eureka
+  ports:
+    - port: 8761
+      name: eureka
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eureka
+spec:
+  selector:
+    matchLabels:
+      app: eureka
+  serviceName: "eureka" # Headless Service name for stable network identity
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: eureka
+    spec:
+      containers:
+        - name: eureka
+          image: bilalkhandevse/microservices-vendormarketplace-eureka:latest
+          imagePullPolicy: Always # Always pull latest image
+          ports:
+            - containerPort: 8761 # Default Eureka port
+          # Note: Eureka pods need to know each other's hostnames
+
+---
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-lb # Load Balancer/NodePort for external/internal access
+spec:
+  type: NodePort # External access via node IP:port (or LoadBalancer in cloud)
+  selector:
+    app: eureka
+  ports:
+    - port: 80 # External port
+      targetPort: 8761 # Container port

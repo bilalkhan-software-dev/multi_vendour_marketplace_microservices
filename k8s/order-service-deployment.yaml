@@ -1,21 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cart-service
+  name: order-service
 spec:
   selector:
     matchLabels:
-      app: cart-service
+      app: order-service
   template:
     metadata:
       labels:
-        app: cart-service
+        app: order-service
     spec:
       containers:
-        - name: cart-service
-          image: bilalkhandevse/microservices-vendormarketplace-cart-service:latest
+        - name: order-service
+          image: bilalkhandevse/microservices-vendormarketplace-order-service:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 8086
+            - containerPort: 8088
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -28,11 +29,23 @@ spec:
                   name: eureka-cm
                   key: eureka_server_address
 
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-cm
+                  key: hostname
+
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-cm
+                  name: postgres-cm
                   key: hostname
+
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: bootstrap_servers
 
           resources:
             requests:
@@ -46,10 +59,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cart-service-svc
+  name: order-service-svc
 spec:
   selector:
-    app: cart-service
+    app: order-service
   ports:
     - port: 80
-      targetPort: 8086
+      targetPort: 8088

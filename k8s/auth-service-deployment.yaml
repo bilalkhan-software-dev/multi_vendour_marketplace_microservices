@@ -12,39 +12,48 @@ spec:
         app: auth-service
     spec:
       containers:
-      - name: auth-service
-        image: bilalkhandevse/microservices-vendormarketplace-auth-service:latest
-        ports:
-        - containerPort: 8081
-        env:
-        - name: SPRING_CONFIG_IMPORT
-          valueFrom:
-            configMapKeyRef:
-              name: config-cm
-              key: config_url
-        - name: DB_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: postgres-cm
-              key: hostname
-        - name: DB_NAME
-          valueFrom:
-            configMapKeyRef:
-              name: postgres-cm
-              key: port
-        - name: BOOTSRTAP_SERVERS
-          valueFrom:
-            configMapKeyRef:
-              name: kafka-cm
-              key: bootstrap_servers      
+        - name: auth-service
+          image: bilalkhandevse/microservices-vendormarketplace-auth-service:latest
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_server_address
 
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-cm
+                  key: hostname
+
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-cm
+                  key: hostname
+
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: bootstrap_servers
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
 ---
 apiVersion: v1
 kind: Service
@@ -54,5 +63,5 @@ spec:
   selector:
     app: auth-service
   ports:
-  - port: 80
-    targetPort: 8081
+    - port: 80
+      targetPort: 8082

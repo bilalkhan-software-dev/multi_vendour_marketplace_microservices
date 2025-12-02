@@ -1,21 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cart-service
+  name: api-gateway
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: cart-service
+      app: api-gateway
   template:
     metadata:
       labels:
-        app: cart-service
+        app: api-gateway
     spec:
       containers:
-        - name: cart-service
-          image: bilalkhandevse/microservices-vendormarketplace-cart-service:latest
+        - name: api-gateway
+          image: bilalkhandevse/microservices-vendormarketplace-gateway:latest
           ports:
-            - containerPort: 8086
+            - containerPort: 2008
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -27,11 +28,10 @@ spec:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
-
-            - name: DB_HOST
+            - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-cm
+                  name: redis-cm
                   key: hostname
 
           resources:
@@ -46,10 +46,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cart-service-svc
+  name: api-gateway-svc
 spec:
+  type: LoadBalancer
   selector:
-    app: cart-service
+    app: api-gateway
   ports:
     - port: 80
-      targetPort: 8086
+      targetPort: 2008
