@@ -136,6 +136,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+        <finalName>seller-service</finalName>
 	</build>
 
 </project>

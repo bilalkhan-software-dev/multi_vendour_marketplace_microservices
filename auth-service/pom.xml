@@ -129,7 +129,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -159,6 +158,6 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>auth-service</finalName>
     </build>
-
 </project>

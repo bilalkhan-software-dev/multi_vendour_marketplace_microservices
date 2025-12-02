@@ -68,8 +68,6 @@
             <version>2.8.14</version>
         </dependency>
 
-
-
         <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -135,6 +133,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+        <finalName>home-service</finalName>
 	</build>
 
 </project>

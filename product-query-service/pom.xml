@@ -131,6 +131,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+        <finalName>product-query-service</finalName>
 	</build>
 
 </project>

@@ -141,6 +141,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+        <finalName>transaction-report-service</finalName>
 	</build>
 
 </project>
