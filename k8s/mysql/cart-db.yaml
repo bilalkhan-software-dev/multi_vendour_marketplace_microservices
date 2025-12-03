@@ -10,7 +10,8 @@ spec:
     - ReadWriteOnce
   storageClassName: manual
   hostPath:
-    path: "/run/desktop/mnt/host/c/temp/tesfiles"
+#    path: "/run/desktop/mnt/host/c/temp/testfiles"
+    path: "/data/mysql"
     type: DirectoryOrCreate
 
 ---
@@ -35,7 +36,7 @@ spec:
   selector:
     matchLabels:
       app: mysql
-  serviceName: mysql
+  serviceName: mysql-headless  # Headless service name
   replicas: 1
   template:
     metadata:
@@ -61,31 +62,19 @@ spec:
                 secretKeyRef:
                   name: mysql-secret
                   key: password
+            - name: MYSQL_DATABASE
+              value: "cart-service-db"
 
           ports:
             - containerPort: 3306
               name: mysql
           volumeMounts:
-            - name: mysql-initdb
-              mountPath: /docker-entrypoint-initdb.d
             - name: mysql-persistent-storage
               mountPath: /var/lib/mysql # ← MySQL stores data here
       volumes:
-        - name: mysql-initdb
-          configMap:
-            name: mysql-initdb-cm
         - name: mysql-persistent-storage
           persistentVolumeClaim:
             claimName: mysql-pvc # ← Points to PVC
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: mysql-initdb-cm
-data:
-  init.sql: |
-    CREATE DATABASE IF NOT EXISTS order-service-db;
 
 ---
 apiVersion: v1
@@ -103,10 +92,26 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mysql
+  name: mysql-headless
 spec:
   clusterIP: None
   selector:
     app: mysql
   ports:
     - port: 3306
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cart-db-cm
+data:
+  hostname: "mysql-0.mysql-headless"
+
+
+  # Pods created:  replication (n)
+# mysql-n
+
+# DNS names:
+#  mysql-n.mysql-headless
+# <pod-name>.<service-name> e.g: DB_HOST mysql-0.mysql-headless  -> without PORT

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: cart-service
 spec:
   selector:
     matchLabels:
-      app: user-service
+      app: cart-service
   template:
     metadata:
       labels:
-        app: user-service
+        app: cart-service
     spec:
       containers:
-        - name: user-service
-          image: bilalkhandevse/microservices-vendormarketplace-user-service:latest
+        - name: cart-service
+          image: bilalkhandevse/microservices-vendormarketplace-cart-service:latest
           ports:
-            - containerPort: 8080
+            - containerPort: 8086
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -31,14 +31,8 @@ spec:
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-cm
+                  name: cart-db-cm
                   key: hostname
-
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              valueFrom:
-                configMapKeyRef:
-                  name: kafka-cm
-                  key: bootstrap_servers
 
           resources:
             requests:
@@ -52,10 +46,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-service-svc
+  name: cart-service-svc
 spec:
   selector:
-    app: user-service
+    app: cart-service
   ports:
     - port: 80
-      targetPort: 8080
+      targetPort: 8086

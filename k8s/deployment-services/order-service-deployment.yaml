@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: product-command-service
+  name: order-service
 spec:
   selector:
     matchLabels:
-      app: product-command-service
+      app: order-service
   template:
     metadata:
       labels:
-        app: product-command-service
+        app: order-service
     spec:
       containers:
-        - name: product-command-service
-          image: bilalkhandevse/microservices-vendormarketplace-product-command-service:latest
+        - name: order-service
+          image: bilalkhandevse/microservices-vendormarketplace-order-service:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8084
+            - containerPort: 8088
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -28,12 +28,11 @@ spec:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
-
-            - name: MONGODB_URL
+            - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: mongodb-cm
-                  key: mongodb-url
+                  name: order-db-cm
+                  key: hostname
 
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
@@ -53,10 +52,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: product-command-service-svc
+  name: order-service-svc
 spec:
   selector:
-    app: product-command-service
+    app: order-service
   ports:
     - port: 80
-      targetPort: 8084
+      targetPort: 8088

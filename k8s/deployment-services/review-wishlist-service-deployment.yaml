@@ -1,21 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: seller-service
+  name: review-wishlist-service
 spec:
   selector:
     matchLabels:
-      app: seller-service
+      app: review-wishlist-service
   template:
     metadata:
       labels:
-        app: seller-service
+        app: review-wishlist-service
     spec:
       containers:
-        - name: seller-service
-          image: bilalkhandevse/microservices-vendormarketplace-seller-service:latest
+        - name: review-wishlist-service
+          image: bilalkhandevse/microservices-vendormarketplace-review-wishlist-service:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 8081
+            - containerPort: 8090
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -27,18 +28,11 @@ spec:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
-
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-cm
+                  name: review-wishlist-db-cm
                   key: hostname
-
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              valueFrom:
-                configMapKeyRef:
-                  name: kafka-cm
-                  key: bootstrap_servers
 
           resources:
             requests:
@@ -52,10 +46,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: seller-service-svc
+  name: review-wishlist-service-svc
 spec:
   selector:
-    app: seller-service
+    app: review-wishlist-service
   ports:
     - port: 80
-      targetPort: 8081
+      targetPort: 8090

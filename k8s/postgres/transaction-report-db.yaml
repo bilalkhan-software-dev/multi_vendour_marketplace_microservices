@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: transaction-report-db-postgres-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: "/data/transaction-report-db-postgres"
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transaction-report-db-postgres-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: transaction-report-db-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transaction-report-db-postgres
+  serviceName: transaction-report-db-postgres-headless
+  template:
+    metadata:
+      labels:
+        app: transaction-report-db-postgres
+    spec:
+      containers:
+        - name: transaction-report-db-postgres
+          image: postgres:15
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+
+            - name: POSTGRES_DB
+              value: "transaction-report-service-db"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: transaction-report-db-postgres-storage
+              mountPath: /var/lib/postgresql/data  # ← stores data here
+      volumes:
+        - name: transaction-report-db-postgres-storage
+          persistentVolumeClaim:
+            claimName: transaction-report-db-postgres-pvc  # ← Points to PVC
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-report-db-postgres-headless
+spec:
+  clusterIP: None
+  selector:
+    app: transaction-report-db-postgres
+  ports:
+    - port: 5438
+      targetPort: 5432
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: transaction-report-db-cm
+data:
+  hostname: "transaction-report-db-postgres-0.transaction-report-db-postgres-headless"
+
+

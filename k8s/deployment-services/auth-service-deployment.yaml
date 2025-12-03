@@ -1,22 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: product-query-service
+  name: auth-service
 spec:
   selector:
     matchLabels:
-      app: product-query-service
+      app: auth-service
   template:
     metadata:
       labels:
-        app: product-query-service
+        app: auth-service
     spec:
       containers:
-        - name: product-query-service
-          image: bilalkhandevse/microservices-vendormarketplace-product-query-service:latest
-          imagePullPolicy: Always
+        - name: auth-service
+          image: bilalkhandevse/microservices-vendormarketplace-auth-service:latest
           ports:
-            - containerPort: 8085
+            - containerPort: 8082
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -28,12 +27,16 @@ spec:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
-
-            - name: MONGODB_URL
+            - name: REDIS_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: mongodb-cm
-                  key: mongodb-url
+                  name: redis-cm
+                  key: hostname
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-db-cm
+                  key: hostname
 
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
@@ -53,10 +56,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: product-query-service-svc
+  name: auth-service-svc
 spec:
   selector:
-    app: product-query-service
+    app: auth-service
   ports:
     - port: 80
-      targetPort: 8085
+      targetPort: 8082

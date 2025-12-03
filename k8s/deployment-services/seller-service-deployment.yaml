@@ -1,22 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: home-service
+  name: seller-service
 spec:
   selector:
     matchLabels:
-      app: home-service
+      app: seller-service
   template:
     metadata:
       labels:
-        app: home-service
+        app: seller-service
     spec:
       containers:
-        - name: home-service
-          image: bilalkhandevse/microservices-vendormarketplace-home-service:latest
-          imagePullPolicy: Always
+        - name: seller-service
+          image: bilalkhandevse/microservices-vendormarketplace-seller-service:latest
           ports:
-            - containerPort: 8091
+            - containerPort: 8081
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -28,11 +27,16 @@ spec:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
-            - name: MONGODB_URL
+            - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: mongodb-cm
-                  key: mongodb-url
+                  name: seller-db-cm
+                  key: hostname
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: bootstrap_servers
 
           resources:
             requests:
@@ -46,10 +50,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: home-service-svc
+  name: seller-service-svc
 spec:
   selector:
-    app: home-service
+    app: seller-service
   ports:
     - port: 80
-      targetPort: 8091
+      targetPort: 8081

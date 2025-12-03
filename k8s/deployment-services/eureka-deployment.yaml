@@ -46,5 +46,5 @@ spec:
   selector:
     app: eureka
   ports:
-    - port: 80 # External port
+    - port: 8761 # External port
       targetPort: 8761 # Container port

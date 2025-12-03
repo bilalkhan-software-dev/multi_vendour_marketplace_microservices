@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: order-service
+  name: transaction-report-service
 spec:
   selector:
     matchLabels:
-      app: order-service
+      app: transaction-report-service
   template:
     metadata:
       labels:
-        app: order-service
+        app: transaction-report-service
     spec:
       containers:
-        - name: order-service
-          image: bilalkhandevse/microservices-vendormarketplace-order-service:latest
+        - name: transaction-report-service
+          image: bilalkhandevse/microservices-vendormarketplace-transaction-report-service:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8088
+            - containerPort: 8067
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -28,24 +28,16 @@ spec:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
-
-            - name: DB_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-cm
-                  key: hostname
-
-            - name: DB_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-cm
-                  key: hostname
-
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
                 configMapKeyRef:
                   name: kafka-cm
                   key: bootstrap_servers
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: transaction-report-db-cm
+                  key: hostname
 
           resources:
             requests:
@@ -59,10 +51,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: order-service-svc
+  name: transaction-report-service-svc
 spec:
   selector:
-    app: order-service
+    app: transaction-report-service
   ports:
     - port: 80
-      targetPort: 8088
+      targetPort: 8067

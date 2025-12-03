@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transaction-report-service
+  name: product-query-service
 spec:
   selector:
     matchLabels:
-      app: transaction-report-service
+      app: product-query-service
   template:
     metadata:
       labels:
-        app: transaction-report-service
+        app: product-query-service
     spec:
       containers:
-        - name: transaction-report-service
-          image: bilalkhandevse/microservices-vendormarketplace-transaction-report-service:latest
+        - name: product-query-service
+          image: bilalkhandevse/microservices-vendormarketplace-product-query-service:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8067
+            - containerPort: 8085
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -28,17 +28,16 @@ spec:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
-
+            - name: MONGODB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: product-query-db-cm
+                  key: mongodb_url
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
                 configMapKeyRef:
                   name: kafka-cm
                   key: bootstrap_servers
-            - name: DB_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-cm
-                  key: hostname
 
           resources:
             requests:
@@ -52,10 +51,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: transaction-report-service-svc
+  name: product-query-service-svc
 spec:
   selector:
-    app: transaction-report-service
+    app: product-query-service
   ports:
     - port: 80
-      targetPort: 8067
+      targetPort: 8085

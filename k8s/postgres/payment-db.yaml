@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: payment-db-postgres-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: "/data/payment-db-postgres"
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: payment-db-postgres-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: payment-db-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-db-postgres
+  serviceName: payment-db-postgres-headless
+  template:
+    metadata:
+      labels:
+        app: payment-db-postgres
+    spec:
+      containers:
+        - name: payment-db-postgres
+          image: postgres:15
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+
+            - name: POSTGRES_DB
+              value: "payment-service-db"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: payment-db-postgres-storage
+              mountPath: /var/lib/postgresql/data  # ← stores data here
+      volumes:
+        - name: payment-db-postgres-storage
+          persistentVolumeClaim:
+            claimName: payment-db-postgres-pvc  # ← Points to PVC
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-db-postgres-headless
+spec:
+  clusterIP: None
+  selector:
+    app: payment-db-postgres
+  ports:
+    - port: 5436
+      targetPort: 5432
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-db-cm
+data:
+  hostname: "payment-db-postgres-0.payment-db-postgres-headless"
+
+

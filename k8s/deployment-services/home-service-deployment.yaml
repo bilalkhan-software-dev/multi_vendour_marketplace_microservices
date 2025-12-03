@@ -1,21 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-service
+  name: home-service
 spec:
   selector:
     matchLabels:
-      app: auth-service
+      app: home-service
   template:
     metadata:
       labels:
-        app: auth-service
+        app: home-service
     spec:
       containers:
-        - name: auth-service
-          image: bilalkhandevse/microservices-vendormarketplace-auth-service:latest
+        - name: home-service
+          image: bilalkhandevse/microservices-vendormarketplace-home-service:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 8082
+            - containerPort: 8091
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -27,24 +28,11 @@ spec:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
-
-            - name: REDIS_HOST
+            - name: MONGODB_URL
               valueFrom:
                 configMapKeyRef:
-                  name: redis-cm
-                  key: hostname
-
-            - name: DB_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-cm
-                  key: hostname
-
-            - name: KAFKA_BOOTSTRAP_SERVERS
-              valueFrom:
-                configMapKeyRef:
-                  name: kafka-cm
-                  key: bootstrap_servers
+                  name: home-db-cm
+                  key: mongodb_url
 
           resources:
             requests:
@@ -58,10 +46,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: auth-service-svc
+  name: home-service-svc
 spec:
   selector:
-    app: auth-service
+    app: home-service
   ports:
     - port: 80
-      targetPort: 8082
+      targetPort: 8091

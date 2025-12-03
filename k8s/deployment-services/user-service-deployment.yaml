@@ -1,22 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: payment-service
+  name: user-service
 spec:
   selector:
     matchLabels:
-      app: payment-service
+      app: user-service
   template:
     metadata:
       labels:
-        app: payment-service
+        app: user-service
     spec:
       containers:
-        - name: payment-service
-          image: bilalkhandevse/microservices-vendormarketplace-payment-service:latest
-          imagePullPolicy: Always
+        - name: user-service
+          image: bilalkhandevse/microservices-vendormarketplace-user-service:latest
           ports:
-            - containerPort: 8089
+            - containerPort: 8080
           env:
             - name: SPRING_CONFIG_IMPORT
               valueFrom:
@@ -28,19 +27,11 @@ spec:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
-
-            - name: DB_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: postgres-cm
-                  key: hostname
-
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: postgres-cm
+                  name: user-db-cm
                   key: hostname
-
             - name: KAFKA_BOOTSTRAP_SERVERS
               valueFrom:
                 configMapKeyRef:
@@ -59,10 +50,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: payment-service-svc
+  name: user-service-svc
 spec:
   selector:
-    app: payment-service
+    app: user-service
   ports:
     - port: 80
-      targetPort: 8089
+      targetPort: 8080
