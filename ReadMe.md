@@ -1,5 +1,4 @@
-# Vendor Marketplace Microservices Architecture 
-
+# Vendor Marketplace Microservices Architecture with Kubernetes Deployment
 ---
 ### 🛒 How This Vendor Marketplace Works
 
