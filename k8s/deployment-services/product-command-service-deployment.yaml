@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-command-service
+spec:
+  selector:
+    matchLabels:
+      app: product-command-service
+  template:
+    metadata:
+      labels:
+        app: product-command-service
+    spec:
+      containers:
+        - name: product-command-service
+          image: bilalkhandevse/microservices-vendormarketplace-product-command-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8084
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_server_address
+            - name: MONGODB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: product-command-db-cm
+                  key: mongodb_url
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: bootstrap_servers
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-command-service-svc
+spec:
+  selector:
+    app: product-command-service
+  ports:
+    - port: 80
+      targetPort: 8084

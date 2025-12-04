@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-service
+spec:
+  selector:
+    matchLabels:
+      app: home-service
+  template:
+    metadata:
+      labels:
+        app: home-service
+    spec:
+      containers:
+        - name: home-service
+          image: bilalkhandevse/microservices-vendormarketplace-home-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8091
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_server_address
+            - name: MONGODB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: home-db-cm
+                  key: mongodb_url
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-service-svc
+spec:
+  selector:
+    app: home-service
+  ports:
+    - port: 80
+      targetPort: 8091

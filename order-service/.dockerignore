@@ -1,0 +1,13 @@
+# .dockerignore
+# Ignore everything in target except the JAR
+target/*
+!target/order-service.jar
+
+# Other ignores
+.git
+.gitignore
+*.iml
+.idea/
+*.log
+.DS_Store
+README.md

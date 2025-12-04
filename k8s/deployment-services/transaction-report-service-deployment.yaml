@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction-report-service
+spec:
+  selector:
+    matchLabels:
+      app: transaction-report-service
+  template:
+    metadata:
+      labels:
+        app: transaction-report-service
+    spec:
+      containers:
+        - name: transaction-report-service
+          image: bilalkhandevse/microservices-vendormarketplace-transaction-report-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8067
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_server_address
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: bootstrap_servers
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: transaction-report-db-cm
+                  key: hostname
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transaction-report-service-svc
+spec:
+  selector:
+    app: transaction-report-service
+  ports:
+    - port: 80
+      targetPort: 8067

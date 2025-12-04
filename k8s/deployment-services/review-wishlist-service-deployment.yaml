@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-wishlist-service
+spec:
+  selector:
+    matchLabels:
+      app: review-wishlist-service
+  template:
+    metadata:
+      labels:
+        app: review-wishlist-service
+    spec:
+      containers:
+        - name: review-wishlist-service
+          image: bilalkhandevse/microservices-vendormarketplace-review-wishlist-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          env:
+            - name: SPRING_CONFIG_IMPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_server_address
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: review-wishlist-db-cm
+                  key: hostname
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: review-wishlist-service-svc
+spec:
+  selector:
+    app: review-wishlist-service
+  ports:
+    - port: 80
+      targetPort: 8090

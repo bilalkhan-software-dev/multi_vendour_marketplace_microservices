@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: product-query-db-mongo-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: "/data/db"
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: product-query-db-mongo-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: product-query-db-mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-query-db-mongo
+  serviceName: product-query-db-mongo-headless
+  template:
+    metadata:
+      labels:
+        app: product-query-db-mongo
+    spec:
+      containers:
+        - name: product-query-db-mongo
+          image: mongo:8.0
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: password
+            - name: MONGO_INITDB_DATABASE
+              value: "product-query-service-db"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: product-query-db-mongo-storage
+              mountPath: /var/lib/mongo/data  # ← stores data here
+      volumes:
+        - name: product-query-db-mongo-storage
+          persistentVolumeClaim:
+            claimName: product-query-db-mongo-pvc  # ← Points to PVC
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-query-db-mongo-headless
+spec:
+  clusterIP: None
+  selector:
+    app: product-query-db-mongo
+  ports:
+    - port: 27018
+      targetPort: 27017
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-query-db-cm
+data:
+  mongodb_url: "mongodb://admin:password123@product-query-db-mongo-0.product-query-db-mongo-headless:27018/product-query-service-db?authSource=admin"

@@ -23,12 +23,6 @@ spring:
       hibernate:
         show_sql: true
 
-admin:
-  info:
-    name: ${ADMIN_NAME}
-    email: ${ADMIN_EMAIL}
-    mobile: ${ADMIN_MOBILE}
-
 
 server:
   port: 8080

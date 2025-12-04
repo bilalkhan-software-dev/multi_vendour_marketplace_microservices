@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: seller-db-postgres-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: "/data/seller-db-postgres"
+    type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seller-db-postgres-pvc
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: seller-db-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seller-db-postgres
+  serviceName: seller-db-postgres-headless
+  template:
+    metadata:
+      labels:
+        app: seller-db-postgres
+    spec:
+      containers:
+        - name: seller-db-postgres
+          image: postgres:15
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+
+            - name: POSTGRES_DB
+              value: "seller-service-db"
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: seller-db-postgres-storage
+              mountPath: /var/lib/postgresql/data  # ← stores data here
+      volumes:
+        - name: seller-db-postgres-storage
+          persistentVolumeClaim:
+            claimName: seller-db-postgres-pvc  # ← Points to PVC
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seller-db-postgres-headless
+spec:
+  clusterIP: None
+  selector:
+    app: seller-db-postgres
+  ports:
+    - port: 5433
+      targetPort: 5432
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seller-db-cm
+data:
+  hostname: "seller-db-postgres-0.seller-db-postgres-headless"
+
+
