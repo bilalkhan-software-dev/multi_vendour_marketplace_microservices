@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: config-cm
 data:
-  config_url: "optional:configserver:http://config-server-svc"
+  config_url: "http://config-server-svc"
 
 ---
 apiVersion: v1
@@ -11,7 +11,7 @@ kind: ConfigMap
 metadata:
   name: eureka-cm
 data:
-  eureka_server_address: http://eureka-0.eureka:8761/eureka/
+  eureka_server_address: "http://eureka-0.eureka:8761/eureka/"
 
 ---
 apiVersion: v1
@@ -27,13 +27,22 @@ kind: ConfigMap
 metadata:
   name: redis-cm
 data:
-  hostname: "redis-0.redis"
+  hostname: "redis"
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: notification-cm
 data:
-  email_username: <my-username>
-  email_password: <my_app_password>
+  email_username: <email-username>
+  email_password: <email-app-password>
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-service-cm
+data:
+  api-gateway-url: "http://127.0.0.1:62198"
+#  url fetch minikube service api-gateway-svc --url (using ingress #in future)
 

@@ -33,8 +33,9 @@ spec:
           ports:
             - containerPort: 8761 # Default Eureka port
           # Note: Eureka pods need to know each other's hostnames
-
----
+          env:
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: "eureka-0.eureka"  # Pod's stable DNS name
 
 ---
 apiVersion: v1

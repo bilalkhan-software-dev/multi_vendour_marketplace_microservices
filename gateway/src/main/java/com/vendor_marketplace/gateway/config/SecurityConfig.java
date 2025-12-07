@@ -31,6 +31,7 @@ public class SecurityConfig {
                                 "/api/v2/products/query/**",
                                 "/api/v2/public/**",
                                 "/api/v2/reviews/public",
+                                "/api/v2/webhook/stripe/**",
                                 "/v3/api-docs/**",
                                 "/actuator/**"
                         ).permitAll()

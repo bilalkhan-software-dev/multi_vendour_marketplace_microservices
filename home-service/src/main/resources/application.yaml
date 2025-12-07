@@ -2,7 +2,7 @@ spring:
   application:
     name: home-service
   config:
-    import: optional:configserver:http://localhost:2007
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:2007}
   data:
     mongodb:
       auto-index-creation: true

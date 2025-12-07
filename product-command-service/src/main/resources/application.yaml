@@ -2,7 +2,7 @@ spring:
   application:
     name: product-command-service
   config:
-    import: optional:configserver:http://localhost:2007
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:2007}
   data:
     mongodb:
       uri: ${MONGODB_URL:mongodb://admin:password123@localhost:27017/product-command-service-db?authSource=admin}

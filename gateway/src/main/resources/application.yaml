@@ -2,192 +2,191 @@ spring:
   application:
     name: gateway-service
   config:
-    import: optional:configserver:http://localhost:2007
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:2007}
   data:
     redis:
       host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      timeout: 2000ms
+      port: 6379
   cloud:
     gateway:
       server:
         webflux:
           routes:
             # AUTH SERVICE - High security, strict rate limiting
-                    - id: auth-service
-                      uri: lb://AUTH-SERVICE
-                      predicates:
-                        - Path=/api/v2/auth/**,/api/v2/admin/auth/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 5
-                            redis-rate-limiter.burstCapacity: 10
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: authServiceBreaker
-                            fallbackUri: forward:/fallback/authService
+            - id: auth-service
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/api/v2/auth/**,/api/v2/admin/auth/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 5
+                    redis-rate-limiter.burstCapacity: 10
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: authServiceBreaker
+                    fallbackUri: forward:/fallback/authService
 
-                    # USER SERVICE - Moderate rate limiting
-                    - id: user-service
-                      uri: lb://USER-SERVICE
-                      predicates:
-                        - Path=/api/v2/user/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 10
-                            redis-rate-limiter.burstCapacity: 20
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: userServiceBreaker
-                            fallbackUri: forward:/fallback/userService
+            # USER SERVICE - Moderate rate limiting
+            - id: user-service
+              uri: lb://USER-SERVICE
+              predicates:
+                - Path=/api/v2/user/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: userServiceBreaker
+                    fallbackUri: forward:/fallback/userService
 
-                    # SELLER SERVICE - Moderate rate limiting
-                    - id: seller-service
-                      uri: lb://SELLER-SERVICE
-                      predicates:
-                        - Path=/api/v2/seller/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 10
-                            redis-rate-limiter.burstCapacity: 20
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: sellerServiceBreaker
-                            fallbackUri: forward:/fallback/sellerService
+            # SELLER SERVICE - Moderate rate limiting
+            - id: seller-service
+              uri: lb://SELLER-SERVICE
+              predicates:
+                - Path=/api/v2/seller/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: sellerServiceBreaker
+                    fallbackUri: forward:/fallback/sellerService
 
-                    # PRODUCT COMMAND SERVICE - Lower rate for write operations
-                    - id: product-command-service
-                      uri: lb://PRODUCT-COMMAND-SERVICE
-                      predicates:
-                        - Path=/api/v2/products/command/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 3
-                            redis-rate-limiter.burstCapacity: 6
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: productCommandBreaker
-                            fallbackUri: forward:/fallback/productCommandService
+            # PRODUCT COMMAND SERVICE - Lower rate for write operations
+            - id: product-command-service
+              uri: lb://PRODUCT-COMMAND-SERVICE
+              predicates:
+                - Path=/api/v2/products/command/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 3
+                    redis-rate-limiter.burstCapacity: 6
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: productCommandBreaker
+                    fallbackUri: forward:/fallback/productCommandService
 
-                    # PRODUCT QUERY SERVICE - Higher rate for read operations
-                    - id: product-query-service
-                      uri: lb://PRODUCT-QUERY-SERVICE
-                      predicates:
-                        - Path=/api/v2/products/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 20
-                            redis-rate-limiter.burstCapacity: 40
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: productQueryBreaker
-                            fallbackUri: forward:/fallback/productQueryService
+            # PRODUCT QUERY SERVICE - Higher rate for read operations
+            - id: product-query-service
+              uri: lb://PRODUCT-QUERY-SERVICE
+              predicates:
+                - Path=/api/v2/products/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 20
+                    redis-rate-limiter.burstCapacity: 40
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: productQueryBreaker
+                    fallbackUri: forward:/fallback/productQueryService
 
-                    # CART SERVICE - Moderate rate limiting
-                    - id: cart-service
-                      uri: lb://CART-SERVICE
-                      predicates:
-                        - Path=/api/v2/carts/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 15
-                            redis-rate-limiter.burstCapacity: 30
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: cartServiceBreaker
-                            fallbackUri: forward:/fallback/cartService
+            # CART SERVICE - Moderate rate limiting
+            - id: cart-service
+              uri: lb://CART-SERVICE
+              predicates:
+                - Path=/api/v2/carts/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 15
+                    redis-rate-limiter.burstCapacity: 30
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: cartServiceBreaker
+                    fallbackUri: forward:/fallback/cartService
 
-                    # TRANSACTION & REPORT SERVICE - Strict rate limiting
-                    - id: transaction-report-service
-                      uri: lb://TRANSACTION-REPORT-SERVICE
-                      predicates:
-                        - Path=/api/v2/transactions/**,/api/v2/admin/tr/**,/api/v2/reports/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 5
-                            redis-rate-limiter.burstCapacity: 10
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: transactionBreaker
-                            fallbackUri: forward:/fallback/transactionService
+            # TRANSACTION & REPORT SERVICE - Strict rate limiting
+            - id: transaction-report-service
+              uri: lb://TRANSACTION-REPORT-SERVICE
+              predicates:
+                - Path=/api/v2/transactions/**,/api/v2/admin/tr/**,/api/v2/reports/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 5
+                    redis-rate-limiter.burstCapacity: 10
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: transactionBreaker
+                    fallbackUri: forward:/fallback/transactionService
 
-                    # ORDER SERVICE - Critical service, balanced rate limiting
-                    - id: order-service
-                      uri: lb://ORDER-SERVICE
-                      predicates:
-                        - Path=/api/v2/orders/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 8
-                            redis-rate-limiter.burstCapacity: 16
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: orderServiceBreaker
-                            fallbackUri: forward:/fallback/orderService
+            # ORDER SERVICE - Critical service, balanced rate limiting
+            - id: order-service
+              uri: lb://ORDER-SERVICE
+              predicates:
+                - Path=/api/v2/orders/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 8
+                    redis-rate-limiter.burstCapacity: 16
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: orderServiceBreaker
+                    fallbackUri: forward:/fallback/orderService
 
-                    # PAYMENT SERVICE - Very strict rate limiting (security sensitive)
-                    - id: payment-service
-                      uri: lb://PAYMENT-SERVICE
-                      predicates:
-                        - Path=/api/v2/payment/**,/api/v2/admin/payment/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 3
-                            redis-rate-limiter.burstCapacity: 6
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: paymentServiceBreaker
-                            fallbackUri: forward:/fallback/paymentService
+            # PAYMENT SERVICE - Very strict rate limiting (security sensitive)
+            - id: payment-service
+              uri: lb://PAYMENT-SERVICE
+              predicates:
+                - Path=/api/v2/payment/**,/api/v2/admin/payment/**,/api/v2/webhook/stripe/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 3
+                    redis-rate-limiter.burstCapacity: 6
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: paymentServiceBreaker
+                    fallbackUri: forward:/fallback/paymentService
 
-                    # REVIEW & WISHLIST SERVICE - Higher rate for user interactions
-                    - id: review-wishlist-service
-                      uri: lb://REVIEW-WISHLIST-SERVICE
-                      predicates:
-                        - Path=/api/v2/reviews/**,/api/v2/wishlists/**,/api/v2/admin/rw/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 20
-                            redis-rate-limiter.burstCapacity: 40
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: reviewServiceBreaker
-                            fallbackUri: forward:/fallback/reviewService
+            # REVIEW & WISHLIST SERVICE - Higher rate for user interactions
+            - id: review-wishlist-service
+              uri: lb://REVIEW-WISHLIST-SERVICE
+              predicates:
+                - Path=/api/v2/reviews/**,/api/v2/wishlists/**,/api/v2/admin/rw/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 20
+                    redis-rate-limiter.burstCapacity: 40
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: reviewServiceBreaker
+                    fallbackUri: forward:/fallback/reviewService
 
-                    # HOME SERVICE - Public facing, highest rate
-                    - id: home-service
-                      uri: lb://HOME-SERVICE
-                      predicates:
-                        - Path=/api/v2/admin/home/**,/api/v2/public/home/**
-                      filters:
-                        - name: RequestRateLimiter
-                          args:
-                            redis-rate-limiter.replenishRate: 50
-                            redis-rate-limiter.burstCapacity: 100
-                            key-resolver: "#{@ipKeyResolver}"
-                        - name: CircuitBreaker
-                          args:
-                            name: homeServiceBreaker
-                            fallbackUri: forward:/fallback/homeService
+            # HOME SERVICE - Public facing, highest rate
+            - id: home-service
+              uri: lb://HOME-SERVICE
+              predicates:
+                - Path=/api/v2/admin/home/**,/api/v2/public/home/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 50
+                    redis-rate-limiter.burstCapacity: 100
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: homeServiceBreaker
+                    fallbackUri: forward:/fallback/homeService
 
 
 

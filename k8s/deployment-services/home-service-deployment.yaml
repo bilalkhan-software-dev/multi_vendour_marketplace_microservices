@@ -18,29 +18,33 @@ spec:
           ports:
             - containerPort: 8091
           env:
-            - name: SPRING_CONFIG_IMPORT
+            - name: CONFIG_SERVER_URL
               valueFrom:
                 configMapKeyRef:
-                  name: config-cm
                   key: config_url
+                  name: config-cm
             - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
               valueFrom:
                 configMapKeyRef:
                   name: eureka-cm
                   key: eureka_server_address
+            - name: EUREKA_INSTANCE_HOSTNAME
+              value: "home-service-svc"
+            - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+              value: "true"
             - name: MONGODB_URL
               valueFrom:
                 configMapKeyRef:
                   name: home-db-cm
                   key: mongodb_url
 
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
+#          resources:
+#            requests:
+#              memory: "256Mi"
+#              cpu: "250m"
+#            limits:
+#              memory: "512Mi"
+#              cpu: "500m"
 
 ---
 apiVersion: v1
