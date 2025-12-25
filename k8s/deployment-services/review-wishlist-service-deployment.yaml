@@ -37,6 +37,8 @@ spec:
                 configMapKeyRef:
                   name: review-wishlist-db-cm
                   key: hostname
+            - name: DB_PORT
+              value: "5432"
 
 #          resources:
 #            requests:

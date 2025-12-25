@@ -78,7 +78,7 @@ spec:
   selector:
     app: auth-db-postgres
   ports:
-    - port: 5434
+    - port: 5432
       targetPort: 5432
 
 ---

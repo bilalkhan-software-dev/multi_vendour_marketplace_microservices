@@ -78,7 +78,7 @@ spec:
   selector:
     app: seller-db-postgres
   ports:
-    - port: 5433
+    - port: 5432
       targetPort: 5432
 
 ---

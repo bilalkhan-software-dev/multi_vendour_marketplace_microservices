@@ -78,7 +78,7 @@ spec:
   selector:
     app: transaction-report-db-postgres
   ports:
-    - port: 5438
+    - port: 5432
       targetPort: 5432
 
 ---

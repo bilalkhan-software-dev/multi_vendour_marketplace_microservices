@@ -37,6 +37,8 @@ spec:
                 configMapKeyRef:
                   name: payment-db-cm
                   key: hostname
+            - name: DB_PORT
+              value: "5432"
             - name: BASE_UR
               valueFrom:
                 configMapKeyRef:

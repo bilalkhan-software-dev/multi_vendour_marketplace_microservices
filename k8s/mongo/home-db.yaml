@@ -77,7 +77,7 @@ spec:
   selector:
     app: home-db-mongo
   ports:
-    - port: 27019
+    - port: 27017
       targetPort: 27017
 
 ---
@@ -86,4 +86,4 @@ kind: ConfigMap
 metadata:
   name: home-db-cm
 data:
-  mongodb_url: "mongodb://admin:password123@home-db-mongo-0.home-db-mongo-headless:27019/home-service-db?authSource=admin"
+  mongodb_url: "mongodb://admin:password123@home-db-mongo-0.home-db-mongo-headless:27017/home-service-db?authSource=admin"

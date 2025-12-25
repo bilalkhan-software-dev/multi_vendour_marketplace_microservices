@@ -78,7 +78,7 @@ spec:
   selector:
     app: payment-db-postgres
   ports:
-    - port: 5436
+    - port: 5432
       targetPort: 5432
 
 ---

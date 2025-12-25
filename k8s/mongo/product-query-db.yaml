@@ -77,7 +77,7 @@ spec:
   selector:
     app: product-query-db-mongo
   ports:
-    - port: 27018
+    - port: 27017
       targetPort: 27017
 
 ---
@@ -86,4 +86,4 @@ kind: ConfigMap
 metadata:
   name: product-query-db-cm
 data:
-  mongodb_url: "mongodb://admin:password123@product-query-db-mongo-0.product-query-db-mongo-headless:27018/product-query-service-db?authSource=admin"
+  mongodb_url: "mongodb://admin:password123@product-query-db-mongo-0.product-query-db-mongo-headless:27017/product-query-service-db?authSource=admin"

@@ -78,7 +78,7 @@ spec:
   selector:
     app: order-db-postgres
   ports:
-    - port: 5435
+    - port: 5432
       targetPort: 5432
 
 ---
