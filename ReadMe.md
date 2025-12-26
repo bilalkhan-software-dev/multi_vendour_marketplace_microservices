@@ -15,8 +15,8 @@
 
  --- 
 
-## Event-Driven Design with SAGA and CQRS Pattern Implementation
-[View on Eraser![](https://app.eraser.io/workspace/3HoiqIF3baeAFIL1cqlW/preview)](https://app.eraser.io/workspace/3HoiqIF3baeAFIL1cqlW)
+## System Architecture & Authentication
+![Application Architecture And Authentication Flow](images/system-architecture-authentication-flow.png)
 
 
 ## **Product Service - CQRS Architecture**
@@ -227,6 +227,10 @@ In a distributed microservices environment, traditional ACID transactions across
 - Teams can work independently on services
 - Technology choices per service domain
 - Faster deployment cycles
+
+## How to run locally on your System
+_For complete setup instructions,_
+[Check this file](docker-setup.md)
 
 ##  Built Through Self-Learning
 This enterprise microservices architecture was developed entirely through free resources - **no paid courses or internships**. The skills were acquired from various YouTube channels and official documentation.

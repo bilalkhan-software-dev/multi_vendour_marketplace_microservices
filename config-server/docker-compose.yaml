@@ -1,0 +1,13 @@
+services:
+  config-server:
+    image: bilalkhandevse/microservices-vendormarketplace-config-server:latest
+    container_name: config-server
+    environment:
+      SPRING_PROFILES_ACTIVE: "git"
+      EUREKA_SERVER_URL: http://eureka-server:8761
+    ports:
+      - "2007:2007"
+    networks:
+      - vendor-marketplace-microservices-network
+
+

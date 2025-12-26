@@ -3,6 +3,8 @@
     <words>
       <w>configserver</w>
       <w>confluentinc</w>
+      <w>kafka</w>
+      <w>postgresql</w>
     </words>
   </dictionary>
 </component>

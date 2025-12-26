@@ -1,7 +1,8 @@
 services:
-  mongodb:
+
+  home-service-mongodb:
     image: mongo:8.0
-    container_name: home-service_mongodb
+    container_name: home-service-mongodb
     restart: unless-stopped
     ports:
       - "27019:27017"
@@ -10,7 +11,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password123
       MONGO_INITDB_DATABASE: home-service-db
     volumes:
-      - mongodb_data:/data/db
+      - home_mongodb_data:/data/db
 
 volumes:
-  mongodb_data:
+  home_mongodb_data:

@@ -41,7 +41,7 @@ public class AuthService {
     public String registerUser(UserRegisterRequest request) {
         log.info("Registering new user: {}", request.getEmail());
 
-        String authId = createAndGetAuthId(request.getEmail(), request.getFullName(), USER_ROLE.ROLE_CUSTOMER, "");
+        String authId = createAndGetAuthId(request.getEmail(), request.getFullName(), USER_ROLE.ROLE_CUSTOMER, null);
 
         UserCreatedEvent event = UserCreatedEvent.builder()
                 .authId(authId)
@@ -61,9 +61,9 @@ public class AuthService {
     @Transactional
     public String registerSeller(SellerRegisterRequest request) {
         log.info("Registering new seller: {}", request.getEmail());
+
         validateSeller(request.getSTRN());
         String authId = createAndGetAuthId(request.getEmail(), request.getName(), USER_ROLE.ROLE_SELLER, request.getSTRN());
-
 
         SellerCreatedEvent event = SellerCreatedEvent.builder()
                 .name(request.getName())

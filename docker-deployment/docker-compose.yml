@@ -1,0 +1,565 @@
+services:
+  # zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # Kafka Broker 1
+  kafka-broker-1:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka-broker-1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-1:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # Kafka Broker 2
+  kafka-broker-2:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka-broker-2
+    depends_on:
+      - zookeeper
+    ports:
+      - "9093:9093"
+      - "29093:29093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-2:9093,PLAINTEXT_HOST://localhost:29093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # Kafka UI (for monitoring)
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+    ports:
+      - "2006:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # postgres
+  auth-service-postgres:
+    image: postgres:15
+    container_name: auth-service-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: auth-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: khan
+    ports:
+      - "5434:5432"
+#    command: postgres -p 5434
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vendor-marketplace-microservices-network
+
+  user-service-postgres:
+    image: postgres:15
+    container_name: user-service-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: user-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: khan
+    ports:
+      - "5432:5432"
+#    command: postgres -p 5432
+    volumes:
+      - user_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vendor-marketplace-microservices-network
+
+  seller-service-postgres:
+    image: postgres:15
+    container_name: seller-service-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: seller-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: khan
+    ports:
+      - "5433:5432"
+#    command: postgres -p 5433
+    volumes:
+      - seller_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vendor-marketplace-microservices-network
+
+  order-service-postgres:
+    image: postgres:15
+    container_name: order-service-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: order-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: khan
+    ports:
+      - "5435:5432"
+#    command: postgres -p 5435
+    volumes:
+      - order_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vendor-marketplace-microservices-network
+
+  payment-service-postgres:
+    image: postgres:15
+    container_name: payment-service-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: payment-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: khan
+    ports:
+      - "5436:5432"
+#    command: postgres -p 5436
+    volumes:
+      - payment_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vendor-marketplace-microservices-network
+
+  review-wishlist-service-postgres:
+    image: postgres:15
+    container_name: review-wishlist-service-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: review-wishlist-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: khan
+    ports:
+      - "5437:5432"
+#    command: postgres -p 5437
+    volumes:
+      - review-wishlist_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vendor-marketplace-microservices-network
+
+  transaction-report-service-postgres:
+    image: postgres:15
+    container_name: transaction-report-service-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: transaction-report-service-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: khan
+    ports:
+      - "5438:5432"
+#    command: postgres -p 5438
+    volumes:
+      - transaction-report_postgres_data:/var/lib/postgresql/data
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # mysql
+  mysql:
+    image: mysql:8.0
+    container_name: cart-service-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: cart-service-db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 1234567
+    ports:
+      - "3306:3306"
+    volumes:
+      - cart_mysql_data:/var/lib/mysql
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # mongo
+  home-service-mongodb:
+    image: mongo:8.0
+    container_name: home-service-mongodb
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+#    command: mongod --port 27019
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: home-service-db
+    volumes:
+      - home_mongodb_data:/data/db
+
+  product-command-service-mongodb:
+    image: mongo:8.0
+    container_name: product-command-service-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+#    command: mongod --port 27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: product-command-service-db
+    volumes:
+      - pc_mongodb_data:/data/db
+
+  product-query-service-mongodb:
+    image: mongo:8.0
+    container_name: product-query-service-mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+#    command: mongod --port 27018
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: product-query-service-db
+    volumes:
+      - pq_mongodb_data:/data/db
+
+  # redis
+  redis:
+    image: redis:latest
+    container_name: auth-service-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: [ "redis-server", "--appendonly", "yes" ]
+    volumes:
+      - redis_data:/data
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # eureka server
+  eureka-server:
+    image: bilalkhandevse/microservices-vendormarketplace-eureka:latest
+    container_name: eureka-server
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_INSTANCE_HOSTNAME: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # config server
+  config-server:
+    image: bilalkhandevse/microservices-vendormarketplace-config-server:latest
+    container_name: config-server
+    environment:
+      SPRING_PROFILES_ACTIVE: "git"
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+    ports:
+      - "2007:2007"
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # gateway server
+  gateway-server:
+    image: bilalkhandevse/microservices-vendormarketplace-gateway:latest
+    container_name: gateway-server
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      REDIS_HOST: redis
+    ports:
+      - "2008:2008"
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # auth service
+  auth-service:
+    image: bilalkhandevse/microservices-vendormarketplace-auth-service:latest
+    container_name: auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      DB_HOST: auth-service-postgres
+      DB_PORT: 5432
+      REDIS_HOST: redis
+    ports:
+      - "8082:8082"
+    networks:
+      - vendor-marketplace-microservices-network
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - auth-service-postgres
+      - redis
+      - zookeeper
+      - config-server
+      - eureka-server
+
+  # user service
+  user-service:
+    image: bilalkhandevse/microservices-vendormarketplace-user-service:latest
+    container_name: user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      DB_HOST: user-service-postgres
+      DB_PORT: 5432
+    ports:
+      - "8080:8080"
+    networks:
+      - vendor-marketplace-microservices-network
+    depends_on:
+      - user-service-postgres
+      - kafka-broker-1
+      - kafka-broker-2
+      - eureka-server
+      - config-server
+      - zookeeper
+
+  # seller service
+  seller-service:
+    image: bilalkhandevse/microservices-vendormarketplace-seller-service:latest
+    container_name: seller-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      DB_HOST: seller-service-postgres
+      DB_PORT: 5432
+    ports:
+      - "8081:8081"
+    depends_on:
+      - seller-service-postgres
+      - kafka-broker-2
+      - kafka-broker-1
+      - eureka-server
+      - config-server
+      - zookeeper
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # order service
+  order-service:
+    image: bilalkhandevse/microservices-vendormarketplace-order-service:latest
+    container_name: order-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      DB_HOST: order-service-postgres
+      DB_PORT: 5432
+    ports:
+      - "8088:8088"
+    depends_on:
+      - order-service-postgres
+      - kafka-broker-2
+      - kafka-broker-1
+      - eureka-server
+      - config-server
+      - zookeeper
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # payment service
+  payment-service:
+    image: bilalkhandevse/microservices-vendormarketplace-payment-service:latest
+    container_name: payment-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      DB_HOST: payment-service-postgres
+      DB_PORT: 5432
+      STRIPE_SECRET_KEY: your-stripe-secret-key
+      BASE_URL: http://payment-service:8089
+    ports:
+      - "8089:8089"
+    depends_on:
+      - payment-service-postgres
+      - kafka-broker-2
+      - kafka-broker-1
+      - eureka-server
+      - config-server
+      - zookeeper
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # review wishlist service
+  review-wishlist-service:
+    image: bilalkhandevse/microservices-vendormarketplace-review-wishlist-service:latest
+    container_name: review-wishlist-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      DB_HOST: review-wishlist-service-postgres
+      DB_PORT: 5432
+    ports:
+      - "8090:8090"
+    depends_on:
+      - review-wishlist-service-postgres
+      - eureka-server
+      - config-server
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # transaction-report service
+  transaction-report-service:
+    image: bilalkhandevse/microservices-vendormarketplace-transaction-report-service:latest
+    container_name: transaction-report-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      DB_HOST: transaction-report-service-postgres
+      DB_PORT: 5432
+    ports:
+      - "8087:8087"
+    depends_on:
+      - transaction-report-service-postgres
+      - kafka-broker-2
+      - kafka-broker-1
+      - eureka-server
+      - config-server
+      - zookeeper
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # notification service
+  notification-service:
+    image: bilalkhandevse/microservices-vendormarketplace-notification-service:latest
+    container_name: notification-service
+    ports:
+      - "8083:8083"
+    environment:
+      EMAIL_USERNAME: your-app-username
+      EMAIL_PASSWORD: your-app-password
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+    networks:
+      - vendor-marketplace-microservices-network
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - zookeeper
+      - eureka-server
+      - config-server
+
+  # cart service
+  cart-service:
+    image: bilalkhandevse/microservices-vendormarketplace-cart-service:latest
+    container_name: cart-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      DB_HOST: mysql
+    ports:
+      - "8086:8086"
+    depends_on:
+      - mysql
+    networks:
+      - vendor-marketplace-microservices-network
+
+  # product command service
+  product-command-service:
+    image: bilalkhandevse/microservices-vendormarketplace-product-command-service:latest
+    container_name: product-command-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      MONGODB_URL: mongodb://admin:password123@product-command-service-mongodb:27017/product-command-service-db?authSource=admin
+    ports:
+      - "8084:8084"
+    networks:
+      - vendor-marketplace-microservices-network
+    depends_on:
+      - product-command-service-mongodb
+      - kafka-broker-1
+      - kafka-broker-2
+      - zookeeper
+      - eureka-server
+      - config-server
+
+  # product query service
+  product-query-service:
+    image: bilalkhandevse/microservices-vendormarketplace-product-query-service:latest
+    container_name: product-query-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      MONGODB_URL: mongodb://admin:password123@product-query-service-mongodb:27017/product-query-service-db?authSource=admin
+    ports:
+      - "8085:8085"
+    networks:
+      - vendor-marketplace-microservices-network
+    depends_on:
+      - product-query-service-mongodb
+      - kafka-broker-1
+      - kafka-broker-2
+      - zookeeper
+      - eureka-server
+      - config-server
+
+  # home service
+  home-service:
+    image: bilalkhandevse/microservices-vendormarketplace-home-service:latest
+    container_name: home-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      MONGODB_URL: mongodb://admin:password123@home-service-mongodb:27017/home-service-db?authSource=admin
+    ports:
+      - "8091:8091"
+    networks:
+      - vendor-marketplace-microservices-network
+    depends_on:
+      - home-service-mongodb
+      - eureka-server
+      - config-server
+
+volumes:
+  redis_data:
+  auth_postgres_data:
+  user_postgres_data:
+  seller_postgres_data:
+  order_postgres_data:
+  payment_postgres_data:
+  review-wishlist_postgres_data:
+  transaction-report_postgres_data:
+  cart_mysql_data:
+  home_mongodb_data:
+  pc_mongodb_data:
+  pq_mongodb_data:
+
+
+networks:
+  vendor-marketplace-microservices-network:
+    driver: bridge

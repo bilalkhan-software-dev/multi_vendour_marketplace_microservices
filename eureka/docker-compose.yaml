@@ -1,0 +1,13 @@
+services:
+  eureka-server:
+    image: bilalkhandevse/microservices-vendormarketplace-eureka:latest
+    container_name: eureka-server
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_INSTANCE_HOSTNAME: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - vendor-marketplace-microservices-network
+
+
