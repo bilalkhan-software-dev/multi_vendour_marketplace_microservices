@@ -1,7 +1,8 @@
 services:
+
   postgres:
     image: postgres:15
-    container_name: microservice-vendor_marketplace-user-service-postgres
+    container_name: postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: user-service-db
@@ -12,6 +13,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # user service
+  user-service:
+    image: bilalkhandevse/microservices-vendormarketplace-user-service:latest
+    container_name: user-service
+    environment:
+      SPRING_PROFILE_ACTIVE: docker
+      CONFIG_SERVER_URL: http://config-server:2007
+      KAFKA_BOOTSTRAP_SERVERS: kafka-broker-1:9092,kafka-broker-2:9093
+      DB_HOST: microservice-vendor_marketplace-user-service-postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - vendor-marketplace-microservices-network
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:
+
+networks:
+  vendor-marketplace-microservices-network:
+    driver: bridge

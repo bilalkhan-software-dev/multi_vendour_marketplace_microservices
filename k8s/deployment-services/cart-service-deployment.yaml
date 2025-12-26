@@ -31,7 +31,6 @@ spec:
               value: "cart-service-svc"
             - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
               value: "true"
-
             - name: DB_HOST
               valueFrom:
                 configMapKeyRef:

@@ -31,7 +31,11 @@ spec:
               value: "notification-service-svc"
             - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
               value: "true"
-
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: kafka-cm
+                  key: bootstrap_servers
             - name: EMAIL_USERNAME
               valueFrom:
                 configMapKeyRef:

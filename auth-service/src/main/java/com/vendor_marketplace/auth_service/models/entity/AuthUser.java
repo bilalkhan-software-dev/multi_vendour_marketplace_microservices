@@ -3,10 +3,7 @@ package com.vendor_marketplace.auth_service.models.entity;
 import com.vendor_marketplace.common.dto.enums.AccountStatus;
 import com.vendor_marketplace.common.dto.enums.USER_ROLE;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -15,7 +12,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "auth_users")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
